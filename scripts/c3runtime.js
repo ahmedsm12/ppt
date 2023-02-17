@@ -3809,14 +3809,16 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Text,
 		C3.Plugins.Button,
 		C3.Plugins.Button.Cnds.OnClicked,
-		C3.Plugins.Text.Acts.SetText,
-		C3.Plugins.Browser.Exps.ExecJS
+		C3.Plugins.Text.Acts.SetFontColor,
+		C3.ScriptsInEvents.EventSheet1_Event1_Act2,
+		C3.ScriptsInEvents.EventSheet1_Event2_Act2
 	];
 };
 self.C3_JsPropNameTable = [
 	{Browser: 0},
 	{Text: 0},
-	{Button: 0}
+	{Button: 0},
+	{Button2: 0}
 ];
 }
 
@@ -3917,10 +3919,8 @@ function or(l, r)
 }
 
 self.C3_ExpressionFuncs = [
-		p => {
-			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => f0("window.top.location.host");
-		}
+		() => -168785336703999,
+		() => -281492157629439
 ];
 
 
