@@ -3811,7 +3811,8 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Button.Cnds.OnClicked,
 		C3.Plugins.Text.Acts.SetFontColor,
 		C3.ScriptsInEvents.EventSheet1_Event1_Act2,
-		C3.ScriptsInEvents.EventSheet1_Event2_Act2
+		C3.Plugins.Text.Acts.SetText,
+		C3.Plugins.Browser.Exps.Referrer
 	];
 };
 self.C3_JsPropNameTable = [
@@ -3920,7 +3921,11 @@ function or(l, r)
 
 self.C3_ExpressionFuncs = [
 		() => -168785336703999,
-		() => -281492157629439
+		() => -281474976711679,
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => f0();
+		}
 ];
 
 
