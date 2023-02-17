@@ -3810,7 +3810,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Button,
 		C3.Plugins.Button.Cnds.OnClicked,
 		C3.Plugins.Text.Acts.SetText,
-		C3.Plugins.Browser.Exps.Domain
+		C3.Plugins.Browser.Exps.ExecJS
 	];
 };
 self.C3_JsPropNameTable = [
@@ -3919,7 +3919,7 @@ function or(l, r)
 self.C3_ExpressionFuncs = [
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => f0();
+			return () => f0("window.top.location.host");
 		}
 ];
 
