@@ -3810,7 +3810,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Button,
 		C3.Plugins.Button.Cnds.OnClicked,
 		C3.Plugins.Text.Acts.SetText,
-		C3.Plugins.Browser.Exps.URL
+		C3.Plugins.Browser.Exps.Domain
 	];
 };
 self.C3_JsPropNameTable = [
