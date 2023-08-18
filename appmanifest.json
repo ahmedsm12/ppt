@@ -1,6 +1,6 @@
 {
-	"name": "New project",
-	"short_name": "New project",
+	"name": "video player",
+	"short_name": "video player",
 	"description": "",
 	"start_url": "index.html",
 	"display": "fullscreen",
