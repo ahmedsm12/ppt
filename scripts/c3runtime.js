@@ -4180,8 +4180,6 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Acts.SetLayerVisible,
 		C3.Behaviors.Timer.Acts.StartTimer,
 		C3.Plugins.System.Cnds.Every,
-		C3.Plugins.Text.Acts.SetText,
-		C3.Plugins.AJAX.Exps.Progress,
 		C3.Behaviors.Timer.Cnds.IsTimerRunning,
 		C3.Behaviors.DragnDrop.Cnds.IsDragging,
 		C3.Plugins.Sprite.Cnds.CompareOpacity,
@@ -4195,7 +4193,11 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Cnds.CompareX,
 		C3.Plugins.video.Acts.SetPlaybackTime,
 		C3.Plugins.Sprite.Exps.X,
-		C3.Plugins.System.Acts.Wait
+		C3.Plugins.System.Acts.Wait,
+		C3.Plugins.Touch.Cnds.OnTapGestureObject,
+		C3.Plugins.Browser.Acts.RequestFullScreen,
+		C3.Plugins.Browser.Cnds.IsFullscreen,
+		C3.Plugins.Browser.Acts.CancelFullScreen
 	];
 };
 self.C3_JsPropNameTable = [
@@ -4218,7 +4220,8 @@ self.C3_JsPropNameTable = [
 	{BoundToLayout: 0},
 	{Timer: 0},
 	{Sprite2: 0},
-	{Text: 0}
+	{Text: 0},
+	{Sprite3: 0}
 ];
 }
 
@@ -4334,10 +4337,6 @@ self.C3_ExpressionFuncs = [
 		() => 3,
 		() => "vis",
 		() => 0.1,
-		p => {
-			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => f0();
-		},
 		() => 100,
 		p => {
 			const n0 = p._GetNode(0);
