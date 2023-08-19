@@ -4176,7 +4176,10 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.AJAX.Acts.RequestFile,
 		C3.Plugins.AJAX.Cnds.OnComplete,
 		C3.Plugins.AJAX.Exps.LastData,
-		C3.Plugins.Touch.Cnds.OnTapGesture,
+		C3.Plugins.System.Acts.WaitForPreviousActions,
+		C3.Plugins.System.Acts.SetGroupActive,
+		C3.Plugins.System.Cnds.IsGroupActive,
+		C3.Plugins.Touch.Cnds.OnTouchStart,
 		C3.Plugins.System.Acts.SetLayerVisible,
 		C3.Behaviors.Timer.Acts.StartTimer,
 		C3.Plugins.System.Cnds.Every,
@@ -4186,7 +4189,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Acts.SetX,
 		C3.Plugins.video.Exps.PlaybackTime,
 		C3.Plugins.video.Exps.Duration,
-		C3.Plugins.Globals.Acts.SetInstanceVar,
+		C3.Plugins.Sprite.Acts.SetWidth,
+		C3.Behaviors.Timer.Acts.PauseResumeTimer,
+		C3.Plugins.Text.Acts.SetText,
 		C3.Behaviors.DragnDrop.Cnds.OnDrop,
 		C3.Plugins.Sprite.Acts.SetOpacity,
 		C3.Plugins.video.Acts.Play,
@@ -4195,9 +4200,25 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.System.Acts.Wait,
 		C3.Plugins.Touch.Cnds.OnTapGestureObject,
+		C3.Plugins.Sprite.Acts.SetAnimFrame,
+		C3.Plugins.video.Cnds.IsPlaying,
+		C3.Plugins.video.Acts.Pause,
 		C3.Plugins.Browser.Acts.RequestFullScreen,
 		C3.Plugins.Browser.Cnds.IsFullscreen,
-		C3.Plugins.Browser.Acts.CancelFullScreen
+		C3.Plugins.Browser.Acts.CancelFullScreen,
+		C3.Plugins.System.Cnds.For,
+		C3.Plugins.System.Exps.tokencount,
+		C3.Plugins.Sprite.Acts.Spawn,
+		C3.Plugins.System.Cnds.Compare,
+		C3.Plugins.Sprite.Exps.IID,
+		C3.Plugins.System.Exps.loopindex,
+		C3.Plugins.Sprite.Acts.SetPos,
+		C3.Plugins.System.Exps.float,
+		C3.Plugins.System.Exps.tokenat,
+		C3.Plugins.Sprite.Acts.SetInstanceVar,
+		C3.Plugins.System.Cnds.CompareBetween,
+		C3.Plugins.Globals.Acts.SetInstanceVar,
+		C3.Plugins.video.Cnds.IsPaused
 	];
 };
 self.C3_JsPropNameTable = [
@@ -4215,13 +4236,20 @@ self.C3_JsPropNameTable = [
 	{BinaryData: 0},
 	{AJAX: 0},
 	{Touch: 0},
-	{Sprite: 0},
+	{bar_gry: 0},
 	{DragDrop: 0},
 	{BoundToLayout: 0},
 	{Timer: 0},
-	{Sprite2: 0},
+	{seek_cir: 0},
 	{Text: 0},
-	{Sprite3: 0}
+	{Sprite3: 0},
+	{bar_blu: 0},
+	{Sprite: 0},
+	{pause: 0},
+	{bar_gol: 0},
+	{goals: 0},
+	{stat: 0},
+	{Sprite2: 0}
 ];
 }
 
@@ -4333,8 +4361,10 @@ self.C3_ExpressionFuncs = [
 			const f5 = p._GetNode(5).GetBoundMethod();
 			return () => (((((n0.ExpInstVar() + n1.ExpInstVar()) + n2.ExpInstVar()) + n3.ExpInstVar()) + n4.ExpInstVar()) + f5());
 		},
+		() => "question",
+		() => "ui",
 		() => 1,
-		() => 3,
+		() => 4.5,
 		() => "vis",
 		() => 0.1,
 		() => 100,
@@ -4345,7 +4375,12 @@ self.C3_ExpressionFuncs = [
 		},
 		p => {
 			const n0 = p._GetNode(0);
-			return () => n0.ExpObject();
+			const n1 = p._GetNode(1);
+			return () => (((n0.ExpObject() / n1.ExpObject()) * 1235) + 10);
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			return () => (Math.round((n0.ExpObject() * 10)) / 10);
 		},
 		() => 99,
 		() => 33,
@@ -4354,7 +4389,96 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			const n1 = p._GetNode(1);
 			return () => (((n0.ExpObject() - 33) / 1235) * n1.ExpObject());
-		}
+		},
+		() => 0,
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const n1 = p._GetNode(1);
+			return () => (f0(n1.ExpInstVar(), ",") - 1);
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			return () => n0.ExpObject();
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => f0();
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			const f3 = p._GetNode(3).GetBoundMethod();
+			return () => (((f0(f1(n2.ExpInstVar(), f3(), ",")) / 150) * 1235) + 48);
+		},
+		() => 593,
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const n1 = p._GetNode(1);
+			const f2 = p._GetNode(2).GetBoundMethod();
+			return () => f0(n1.ExpInstVar(), f2(), ",");
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => f0(f1(n2.ExpInstVar(), 0, ","));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => (f0(f1(n2.ExpInstVar(), 0, ",")) + 0.05);
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => f0(f1(n2.ExpInstVar(), 1, ","));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => (f0(f1(n2.ExpInstVar(), 1, ",")) + 0.05);
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => f0(f1(n2.ExpInstVar(), 2, ","));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => (f0(f1(n2.ExpInstVar(), 2, ",")) + 0.05);
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => f0(f1(n2.ExpInstVar(), 3, ","));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => (f0(f1(n2.ExpInstVar(), 3, ",")) + 0.05);
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => f0(f1(n2.ExpInstVar(), 4, ","));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => (f0(f1(n2.ExpInstVar(), 4, ",")) + 0.05);
+		},
+		() => "quiz"
 ];
 
 
