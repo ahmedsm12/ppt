@@ -10,6 +10,8 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.CSV,
 		C3.Plugins.Touch,
 		C3.Plugins.HTMLElement,
+		C3.Behaviors.Timer,
+		C3.Plugins.Mouse,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Plugins.System.Cnds.ForEachOrdered,
 		C3.Plugins.Sprite.Cnds.CompareInstanceVar,
@@ -27,7 +29,12 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Text.Cnds.CompareInstanceVar,
 		C3.Plugins.System.Exps.tokenat,
 		C3.Plugins.HTMLElement.Cnds.OnCreated,
-		C3.Plugins.HTMLElement.Acts.SetContent
+		C3.Plugins.HTMLElement.Acts.SetContent,
+		C3.Plugins.Mouse.Cnds.OnMovement,
+		C3.Plugins.Touch.Cnds.OnTouchStart,
+		C3.Behaviors.Timer.Acts.StartTimer,
+		C3.Behaviors.Tween.Acts.TweenOneProperty,
+		C3.Behaviors.Timer.Cnds.OnTimer
 	];
 };
 self.C3_JsPropNameTable = [
@@ -58,7 +65,11 @@ self.C3_JsPropNameTable = [
 	{Touch: 0},
 	{numbers: 0},
 	{HTMLElement: 0},
-	{seen: 0}
+	{seen: 0},
+	{index: 0},
+	{Timer: 0},
+	{home: 0},
+	{Mouse: 0}
 ];
 
 self.InstanceType = {
@@ -76,5 +87,8 @@ self.InstanceType = {
 	Touch: class extends self.IInstance {},
 	numbers: class extends self.ITextInstance {},
 	HTMLElement: class extends self.IHTMLElementInstance {},
-	seen: class extends self.ISpriteInstance {}
+	seen: class extends self.ISpriteInstance {},
+	index: class extends self.ISpriteInstance {},
+	home: class extends self.ISpriteInstance {},
+	Mouse: class extends self.IInstance {}
 }
