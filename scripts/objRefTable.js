@@ -37,13 +37,13 @@ self.C3_JsPropNameTable = [
 	{Tween: 0},
 	{arrow: 0},
 	{unitName: 0},
+	{maxUnit: 0},
 	{icons: 0},
 	{Titles: 0},
 	{TiledBackground: 0},
 	{id: 0},
 	{subjectTitle: 0},
 	{unit: 0},
-	{maxUnit: 0},
 	{lessonNum: 0},
 	{v_counter: 0},
 	{Pin: 0},
@@ -57,7 +57,8 @@ self.C3_JsPropNameTable = [
 	{v_lessons_title: 0},
 	{Touch: 0},
 	{numbers: 0},
-	{HTMLElement: 0}
+	{HTMLElement: 0},
+	{seen: 0}
 ];
 
 self.InstanceType = {
@@ -74,5 +75,6 @@ self.InstanceType = {
 	v_lessons_title: class extends self.ISpriteInstance {},
 	Touch: class extends self.IInstance {},
 	numbers: class extends self.ITextInstance {},
-	HTMLElement: class extends self.IHTMLElementInstance {}
+	HTMLElement: class extends self.IHTMLElementInstance {},
+	seen: class extends self.ISpriteInstance {}
 }

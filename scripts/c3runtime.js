@@ -1312,7 +1312,7 @@ self.C3_ExpressionFuncs = [
 		p => {
 			const n0 = p._GetNode(0);
 			const n1 = p._GetNode(1);
-			return () => (and((and((("<video width='1280' height='720' controls autoplay><source src='" + n0.ExpInstVar()) + "/u"), n1.ExpInstVar()) + "/L"), 1) + ".ts' type='video/mp2t'></video>");
+			return () => (and((and((("<video width='1280' height='720' controls autoplay><source src='" + n0.ExpInstVar()) + "/u"), n1.ExpInstVar()) + "/L"), 1) + ".mp4' type='video/mp4'></video>");
 		}
 ];
 
