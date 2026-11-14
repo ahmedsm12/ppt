@@ -3,38 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة التهجئة التفاعلية - نسخة صعوبات التعلم واللوح الذكي</title>
-    <!-- تحميل تلقائي لملف الحزمة الصوتية المحلي بجانب ملف HTML حتى بدون خادم (file://) -->
-    <script src="audio_pack.js" onerror="console.info('لم يتم العثور على audio_pack.js بجانب الملف، سيتم فحص audio_pack.json أو الذاكرة المحلية.')"></script>
-
+    <title>لعبة التهجئة التفاعلية - Gemini Natural TTS</title>
+    <!-- أيقونة مدمجة لمنع خطأ favicon.ico 404 في الكونسول -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
     <style>
-        :root {
-            /* ألوان عالية التباين ومريحة بصرياً لذوي صعوبات التعلم */
-            --red-letter: #d9381e;
-            --green-letter: #1b8a4b;
-            --blue-letter: #1d6fa5;
-            --gold: #f1c40f;
-            --dark-glass: rgba(24, 43, 58, 0.78);
-            --light-glass: rgba(255, 255, 255, 0.75);
-            /* خط Arial الأساسي الواضح والمجرب لذوي صعوبات التعلم */
-            --word-font: 'Arial', 'Tahoma', sans-serif;
-            --ui-font: 'Arial', 'Tahoma', sans-serif;
-        }
-
         * {
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         body {
             margin: 0;
             padding: 0;
-            background: #1e2d38;
+            background: #1e293b;
             overflow: hidden;
             touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: var(--ui-font);
+            font-family: 'Arial', 'Tahoma', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -42,206 +28,203 @@
             width: 100vw;
         }
 
-        /* حاوية اللعبة الأساسية بأبعاد اللوح الذكي القياسية 1280x720 مع خلفية مصممة لذوي صعوبات التعلم */
+        /* حاوية اللعبة القياسية للوح الذكي 16:9 */
         #game-container {
             width: 1280px;
             height: 720px;
             position: relative;
-            background-color: #dcebe8;
+            background: linear-gradient(180deg, #eBF4F6 0%, #dbeafe 55%, #dcfce7 100%);
             overflow: hidden;
             transform-origin: center center;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.45);
             border-radius: 16px;
         }
 
-        /* الخلفية المدمجة المخصصة لذوي صعوبات التعلم (هادئة، قليلة المشتتات، تباين مريح للعين) */
-        #ld-friendly-bg {
+        /* خلفية مريحة بصرياً لذوي صعوبات التعلم */
+        .ld-bg-decor {
             position: absolute;
             inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            z-index: 1;
         }
 
-        /* في حال رغب المعلم بالتبديل إلى صورة خلفية خارجية image.jpg */
-        #game-container.custom-image-bg {
-            background-image: url('image.jpg');
-            background-size: cover;
-            background-position: center;
-        }
-        #game-container.custom-image-bg #ld-friendly-bg {
-            opacity: 0;
-        }
-
-        /* ================= الشريط العلوي والقائمة ================= */
-        #menu-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            background: rgba(234, 244, 244, 0.35);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
+        /* ================= الشريط العلوي ================= */
         #top-bar {
             position: absolute;
-            top: 20px;
+            top: 18px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             align-items: center;
             gap: 14px;
-            background: var(--dark-glass);
-            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 10px 22px;
             border-radius: 22px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.25);
+            border: 2px solid #cbd5e1;
             width: 92%;
             justify-content: space-between;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            z-index: 15;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
         }
 
         #stars-count {
-            color: #fff;
-            font-size: 22px;
+            color: #1e293b;
+            font-size: 24px;
             font-weight: bold;
-            min-width: 130px;
+            min-width: 135px;
             text-align: center;
-            background: rgba(255, 255, 255, 0.12);
+            background: #fef3c7;
             padding: 6px 14px;
             border-radius: 14px;
+            border: 2px solid #fde68a;
         }
 
         #progress-bg {
             flex-grow: 1;
-            height: 14px;
-            background: rgba(255, 255, 255, 0.2);
+            height: 16px;
+            background: #e2e8f0;
             border-radius: 10px;
             overflow: hidden;
             position: relative;
+            border: 1px solid #cbd5e1;
         }
 
         #progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #f1c40f, #f39c12, #2ecc71);
+            background: linear-gradient(90deg, #f59e0b, #10b981);
             border-radius: 10px;
-            transition: width 0.5s ease;
+            transition: width 0.4s ease;
         }
 
         #top-controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
         }
 
-        .top-btn {
-            background: #ffffff;
+        .top-pill-btn {
+            background: #f8fafc;
             border: 2px solid #cbd5e1;
             border-radius: 14px;
-            height: 44px;
-            padding: 0 13px;
-            font-size: 16px;
+            padding: 8px 14px;
+            font-size: 17px;
             font-weight: bold;
-            font-family: var(--ui-font);
             color: #1e293b;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 6px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-            transition: transform 0.15s, background 0.2s;
+            font-family: 'Arial', sans-serif;
+            transition: all 0.15s;
         }
 
-        .top-btn.icon-only {
-            width: 44px;
-            padding: 0;
+        .top-pill-btn:active { transform: scale(0.95); }
+
+        .top-pill-btn.gemini-ready {
+            background: #ecfdf5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .top-pill-btn.gemini-missing {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .top-icon-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
             border-radius: 50%;
+            width: 44px;
+            height: 44px;
             font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
         }
 
-        .top-btn:active {
-            transform: scale(0.92);
-        }
+        .top-icon-btn:active { transform: scale(0.92); }
 
-        .top-btn.audio-ready {
-            background: #dcfce7;
-            color: #14532d;
-            border: 2px solid #16a34a;
+        /* ================= شاشة القائمة ================= */
+        #menu-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 60px;
         }
 
         #menu-header {
-            color: #1e3a4c;
+            color: #1e293b;
             font-size: 36px;
-            margin-top: 52px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             font-weight: bold;
-            background: rgba(253, 251, 247, 0.92);
+            background: rgba(255,255,255,0.85);
             padding: 6px 32px;
             border-radius: 20px;
             border: 2px solid #cbd5e1;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         #level-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 22px;
-            padding: 26px 36px;
-            background: rgba(253, 251, 247, 0.88);
-            border-radius: 32px;
+            padding: 28px 36px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 28px;
             border: 3px solid #cbd5e1;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-            max-width: 860px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            max-width: 880px;
         }
 
         .level-btn {
-            width: 122px;
-            height: 122px;
+            width: 155px;
+            height: 125px;
             background: #ffffff;
-            border-radius: 50%;
+            border-radius: 22px;
+            border: 3px solid #94a3b8;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            font-weight: bold;
-            color: #1e293b;
             cursor: pointer;
-            transition: transform 0.18s, box-shadow 0.18s;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), inset 0 -4px 0 #cbd5e1;
-            border: 3px solid #94a3b8;
+            transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 6px 0 #cbd5e1;
             position: relative;
         }
 
-        .level-btn:active {
-            transform: scale(0.93);
+        .level-btn:hover { border-color: #3b82f6; }
+        .level-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cbd5e1; }
+
+        .level-btn.cached-ready {
+            border-color: #10b981;
+            box-shadow: 0 6px 0 #a7f3d0;
         }
 
-        .level-btn.completed {
-            border-color: #eab308;
-            background: #fefce8;
+        .level-num-badge { font-size: 28px; font-weight: bold; color: #0f172a; }
+        .level-words-preview { font-size: 16px; color: #475569; margin-top: 2px; font-weight: bold; }
+        .level-btn .stars { font-size: 22px; margin-top: 4px; letter-spacing: 2px; }
+        .level-btn .stars .empty { color: #cbd5e1; }
+
+        .cached-dot {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+            display: none;
         }
 
-        .level-btn .stars {
-            font-size: 22px;
-            margin-top: 4px;
-            letter-spacing: 2px;
-            line-height: 1;
-        }
-
-        .level-btn .stars .empty {
-            color: #cbd5e1;
-        }
+        .level-btn.cached-ready .cached-dot { display: block; }
 
         .nav-arrow {
             position: absolute;
@@ -249,52 +232,33 @@
             transform: translateY(-50%);
             background: #ffffff;
             border: 3px solid #94a3b8;
-            font-size: 46px;
-            font-weight: bold;
             color: #1e293b;
-            width: 66px;
-            height: 90px;
+            font-size: 44px;
+            width: 68px;
+            height: 96px;
             border-radius: 20px;
             cursor: pointer;
             z-index: 11;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 0 #cbd5e1;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.15s;
+            font-weight: bold;
         }
 
-        .nav-arrow:active {
-            transform: translateY(-50%) scale(0.9);
-        }
-
+        .nav-arrow:active { transform: translateY(-46%); box-shadow: 0 2px 0 #cbd5e1; }
         #prev-page { right: 28px; }
         #next-page { left: 28px; }
-
-        #page-indicator {
-            color: #1e3a4c;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 12px;
-            background: rgba(253, 251, 247, 0.92);
-            padding: 5px 18px;
-            border-radius: 12px;
-            border: 2px solid #cbd5e1;
-        }
 
         /* ================= شاشة التهجئة ================= */
         #game-screen {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             display: none;
-            z-index: 5;
-            background: transparent;
+            z-index: 12;
         }
 
-        .top-game-hud {
+        .screen-top-nav {
             position: absolute;
             top: 22px;
             left: 28px;
@@ -302,713 +266,635 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 8;
+            z-index: 20;
         }
 
-        #level-progress {
+        #back-btn, #test-back-btn {
+            padding: 12px 26px;
+            background: #ef4444;
             color: #fff;
-            font-size: 22px;
-            font-weight: bold;
-            background: var(--dark-glass);
-            padding: 10px 24px;
-            border-radius: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.25);
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .back-btn {
-            padding: 10px 26px;
-            background: #d9381e;
-            color: #fff;
-            border: 2px solid #fff;
+            border: none;
             border-radius: 16px;
             font-size: 22px;
-            font-family: var(--ui-font);
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
-            transition: transform 0.15s;
+            font-family: 'Arial', sans-serif;
+            box-shadow: 0 5px 0 #b91c1c;
         }
 
-        .back-btn:active {
-            transform: scale(0.93);
+        #back-btn:active, #test-back-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #b91c1c; }
+
+        .level-badge-info {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 10px 24px;
+            border-radius: 16px;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        /* لوحة عرض الكلمة المريحة بصرياً لذوي صعوبات التعلم (خلفية كريمية دافئة تقلل الإجهاد البصري) */
+        .quick-gen-level-btn {
+            background: #eff6ff;
+            border: 2px solid #93c5fd;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 4px 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* لوحة القراءة المخصصة لذوي صعوبات التعلم */
         #word-container {
             position: absolute;
             top: 36%;
             left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center;
-            width: 74%;
-            max-width: 820px;
             background: #fdfbf7;
-            padding: 28px 40px;
+            border: 5px solid #cbd5e1;
             border-radius: 36px;
-            box-shadow: 0 14px 36px rgba(30, 58, 76, 0.18), inset 0 -5px 0 #e6dec8;
-            border: 5px solid #d4c4a8;
-            pointer-events: none;
+            padding: 25px 80px;
+            min-width: 560px;
+            min-height: 235px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 240px;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.1);
         }
 
-        /* خط Arial بحجم متوازن ومناسب جداً لذوي صعوبات التعلم مع وضوح التشكيل والربط */
         word {
             display: inline-block;
             direction: rtl;
             font-family: 'Arial', 'Tahoma', sans-serif !important;
-            font-size: clamp(95px, 11.5vw, 150px);
-            line-height: 1.45;
+            font-size: 145px;
+            line-height: 1.35;
             font-weight: bold;
             letter-spacing: 0px;
-            pointer-events: none;
+            text-align: center;
+            white-space: nowrap;
         }
 
-        c1, c2, c3,
-        .syl {
+        c1, c2, c3 {
             display: inline;
-            position: relative;
             font-family: 'Arial', 'Tahoma', sans-serif !important;
-            font-size: inherit;
-            font-weight: bold;
-            transition: filter 0.2s, transform 0.2s;
+            transition: filter 0.2s;
         }
 
-        .syl-1, c1 { color: var(--red-letter) !important; }
-        .syl-2, c2 { color: var(--green-letter) !important; }
-        .syl-3, c3 { color: var(--blue-letter) !important; }
+        c1 { color: #dc2626 !important; }
+        c2 { color: #16a34a !important; }
+        c3 { color: #2563eb !important; }
 
-        @keyframes syllableHighlight {
+        @keyframes letterHighlight {
             0% { filter: drop-shadow(0 0 0px rgba(0,0,0,0)); }
-            50% { filter: drop-shadow(0 4px 12px rgba(241, 196, 15, 0.9)) brightness(1.12); }
+            50% { filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.85)); }
             100% { filter: drop-shadow(0 0 0px rgba(0,0,0,0)); }
         }
 
-        .syl-active {
-            animation: syllableHighlight 0.55s ease-out;
+        .active-letter-glow {
+            animation: letterHighlight 0.55s ease;
             text-decoration: underline;
-            text-decoration-thickness: 7px;
-            text-underline-offset: 16px;
+            text-underline-offset: 18px;
         }
 
-        /* الدوائر الثلاث للتهجئة بدون أي نصوص بداخلها (ملساء وواضحة) */
+        /* الدوائر الملونة بدون نص بداخلها */
         #circles-container {
             position: absolute;
             bottom: 48px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 90px;
-            z-index: 7;
+            gap: 85px;
+            z-index: 15;
         }
 
         .circle {
-            width: 94px;
-            height: 94px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28), inset 0 -6px 0 rgba(0, 0, 0, 0.22), inset 0 6px 10px rgba(255, 255, 255, 0.35);
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
-            position: relative;
+            transition: transform 0.15s, opacity 0.35s ease, box-shadow 0.15s;
             opacity: 0;
             pointer-events: none;
-            transform: translateY(12px) scale(0.85);
         }
 
-        .circle.visible {
-            opacity: 1;
-            pointer-events: all;
-            transform: translateY(0) scale(1);
-        }
-
-        .circle:active {
-            transform: scale(0.88) !important;
-        }
+        .circle.visible { opacity: 1; pointer-events: all; }
+        .circle:active { transform: translateY(5px) scale(0.95); }
 
         .circle-red {
-            background: radial-gradient(circle at 35% 30%, #ff6b52, #d9381e 70%, #a8230d);
-            border: 5px solid #ffffff;
-        }
-        .circle-green {
-            background: radial-gradient(circle at 35% 30%, #3ee07f, #1b8a4b 70%, #116133);
-            border: 5px solid #ffffff;
-        }
-        .circle-blue {
-            background: radial-gradient(circle at 35% 30%, #4db2f0, #1d6fa5 70%, #124b73);
-            border: 5px solid #ffffff;
+            background: radial-gradient(circle at 35% 30%, #f87171, #dc2626);
+            border: 5px solid #991b1b;
+            box-shadow: 0 8px 0 #7f1d1d, 0 12px 20px rgba(0,0,0,0.2);
         }
 
-        /* زر الاستماع للكلمة كاملة وزر التالي */
+        .circle-green {
+            background: radial-gradient(circle at 35% 30%, #4ade80, #16a34a);
+            border: 5px solid #166534;
+            box-shadow: 0 8px 0 #14532d, 0 12px 20px rgba(0,0,0,0.2);
+        }
+
+        .circle-blue {
+            background: radial-gradient(circle at 35% 30%, #60a5fa, #2563eb);
+            border: 5px solid #1e40af;
+            box-shadow: 0 8px 0 #1e3a8a, 0 12px 20px rgba(0,0,0,0.2);
+        }
+
         #controls-area {
             position: absolute;
-            bottom: 162px;
+            bottom: 168px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 30px;
             align-items: center;
             justify-content: center;
-            z-index: 8;
+            z-index: 15;
         }
 
         #listen-btn {
-            width: 78px;
-            height: 78px;
-            background: linear-gradient(145deg, #fde047, #eab308);
+            width: 86px;
+            height: 86px;
+            background: #ffffff;
             border-radius: 50%;
-            border: 4px solid #ffffff;
+            border: 4px solid #0f172a;
             cursor: pointer;
-            font-size: 36px;
-            color: #1e293b;
+            font-size: 40px;
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 7px 0 #0f172a;
             transition: transform 0.15s;
         }
 
-        #listen-btn:active {
-            transform: scale(0.9);
-        }
+        #listen-btn:active { transform: translateY(4px); box-shadow: 0 3px 0 #0f172a; }
 
         #next-word-btn {
             position: absolute;
             left: 36px;
-            bottom: 52px;
-            background: #1b8a4b;
-            color: #fff;
-            border: 4px solid #fff;
-            padding: 15px 32px;
-            border-radius: 22px;
-            font-size: 25px;
-            font-family: var(--ui-font);
+            bottom: 58px;
+            background: #10b981;
+            color: #ffffff;
+            border: none;
+            padding: 18px 34px;
+            border-radius: 20px;
+            font-size: 26px;
             cursor: pointer;
             font-weight: bold;
+            font-family: 'Arial', sans-serif;
             display: none;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-            transition: transform 0.15s;
-            z-index: 8;
+            box-shadow: 0 6px 0 #047857;
+            z-index: 15;
         }
 
-        #next-word-btn:active {
-            transform: scale(0.92);
-        }
+        #next-word-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #047857; }
 
         /* ================= طور الاختبار ================= */
         #test-screen {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             display: none;
-            z-index: 6;
-            background: rgba(212, 231, 229, 0.65);
+            z-index: 14;
+            background: rgba(241, 245, 249, 0.85);
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding-top: 40px;
         }
 
         #test-header {
             display: flex;
             align-items: center;
             gap: 18px;
-            margin-top: 25px;
-            margin-bottom: 22px;
-            background: var(--dark-glass);
+            margin-bottom: 24px;
+            background: #ffffff;
             padding: 12px 32px;
-            border-radius: 28px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            border: 3px solid #cbd5e1;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
         }
 
-        #test-prompt-text {
-            color: #fff;
-            font-size: 26px;
-            font-weight: bold;
-        }
+        #test-prompt-label { font-size: 28px; font-weight: bold; color: #1e293b; }
 
         #speak-q-btn {
-            width: 66px;
-            height: 66px;
-            background: linear-gradient(145deg, #fde047, #eab308);
+            width: 68px;
+            height: 68px;
+            background: #3b82f6;
+            color: #fff;
             border-radius: 50%;
-            border: 3px solid #fff;
+            border: none;
             cursor: pointer;
             font-size: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.25);
-            transition: transform 0.15s;
+            box-shadow: 0 5px 0 #1d4ed8;
         }
 
-        #speak-q-btn:active {
-            transform: scale(0.9);
-        }
+        #speak-q-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #1d4ed8; }
 
         #test-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-            width: 740px;
+            width: 760px;
         }
 
         .test-option-btn {
             background: #fdfbf7;
-            padding: 16px 24px;
+            padding: 18px;
             border-radius: 26px;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14), inset 0 -4px 0 #e6dec8;
-            transition: transform 0.15s, border-color 0.2s, background 0.2s;
+            box-shadow: 0 7px 0 #cbd5e1;
+            transition: transform 0.15s, border-color 0.15s;
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 5px solid #d4c4a8;
-            min-height: 125px;
+            border: 4px solid #94a3b8;
+            min-height: 135px;
         }
 
-        .test-option-btn:active {
-            transform: scale(0.96);
-        }
-
-        .test-option-btn word {
-            font-family: 'Arial', 'Tahoma', sans-serif !important;
-            font-size: 56px;
-            line-height: 1.35;
-        }
+        .test-option-btn word { font-size: 76px; line-height: 1.25; }
 
         .test-option-btn.selected {
-            border-color: #1d6fa5;
-            background: #e0f2fe;
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 7px 0 #93c5fd;
             transform: scale(1.02);
         }
 
         .test-option-btn.correct {
-            border-color: #1b8a4b;
+            border-color: #16a34a;
             background: #dcfce7;
-            transform: scale(1.03);
+            box-shadow: 0 7px 0 #86efac;
         }
 
         .test-option-btn.wrong {
-            border-color: #d9381e;
+            border-color: #dc2626;
             background: #fee2e2;
+            box-shadow: 0 7px 0 #fca5a5;
         }
 
-        #feedback-banner {
-            min-height: 40px;
-            margin-top: 14px;
-            font-size: 26px;
-            font-weight: bold;
-            color: #1e3a4c;
-        }
-
-        #confirm-btn-area {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        #confirm-btn-area { margin-top: 28px; }
 
         #confirm-btn {
-            background: #ffffff;
-            color: #64748b;
-            border: 3px solid #cbd5e1;
-            padding: 14px 52px;
-            border-radius: 22px;
-            font-size: 26px;
-            font-family: var(--ui-font);
+            background: #94a3b8;
+            color: #ffffff;
+            border: none;
+            padding: 16px 55px;
+            border-radius: 20px;
+            font-size: 28px;
             font-weight: bold;
+            font-family: 'Arial', sans-serif;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
             opacity: 0.5;
             pointer-events: none;
-            transition: all 0.2s;
+            transition: 0.2s;
         }
 
         #confirm-btn.active {
             opacity: 1;
             pointer-events: all;
-            background: #1b8a4b;
-            color: #fff;
-            border-color: #fff;
+            background: #16a34a;
+            box-shadow: 0 6px 0 #15803d;
         }
 
-        #confirm-btn.active:active {
-            transform: scale(0.93);
-        }
-
-        /* ================= نوافذ الحوار وإعدادات الصوت الاحترافية ================= */
-        .modal-overlay {
+        /* ================= نافذة نهاية المرحلة ================= */
+        #level-complete {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             display: none;
             z-index: 30;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(6px);
+            background: rgba(15, 23, 42, 0.7);
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
-        .modal-box {
-            background: #fdfbf7;
-            padding: 28px 34px;
-            border-radius: 30px;
+        #complete-box {
+            background: #ffffff;
+            padding: 45px;
+            border-radius: 36px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-            max-width: 720px;
-            width: 92%;
-            color: #1e293b;
-            border: 4px solid #d4c4a8;
+            border: 4px solid #cbd5e1;
+            max-width: 520px;
+            width: 85%;
         }
 
-        .modal-title {
-            font-size: 28px;
+        #complete-title { font-size: 38px; color: #0f172a; font-weight: bold; margin-bottom: 10px; }
+        #complete-stars { font-size: 62px; letter-spacing: 10px; margin: 18px 0; }
+        #complete-msg { font-size: 24px; color: #334155; margin-bottom: 28px; font-weight: bold; }
+
+        #complete-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 16px 42px;
+            border-radius: 20px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 8px;
-            color: #0f172a;
+            font-family: 'Arial', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1d4ed8;
         }
 
-        .modal-subtitle {
-            font-size: 17px;
-            color: #475569;
-            margin-bottom: 16px;
-            line-height: 1.5;
+        /* ================= نافذة استوديو صوت Gemini ================= */
+        #gemini-modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.78);
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
 
-        .audio-settings-grid {
+        .modal-card {
+            background: #ffffff;
+            width: 820px;
+            max-height: 670px;
+            border-radius: 28px;
+            padding: 26px 32px;
+            border: 3px solid #cbd5e1;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            text-align: right;
-            background: #ffffff;
-            padding: 16px 20px;
-            border-radius: 20px;
-            border: 2px solid #e2e8f0;
-            margin-bottom: 16px;
+            gap: 14px;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
         }
 
-        .setting-row {
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
         }
 
-        .setting-label {
-            font-size: 17px;
+        .modal-header h2 { margin: 0; font-size: 24px; color: #0f172a; }
+
+        .close-modal-btn {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+            cursor: pointer;
             font-weight: bold;
-            color: #1e293b;
         }
 
-        .select-control, .input-control {
-            padding: 9px 14px;
+        .quota-alert {
+            background: #eff6ff;
+            border: 2px solid #93c5fd;
+            color: #1e3a8a;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .form-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 15px; font-weight: bold; color: #334155; }
+
+        .input-group input, .input-group select {
+            padding: 10px 14px;
             border-radius: 12px;
             border: 2px solid #cbd5e1;
-            font-family: var(--ui-font);
-            font-size: 15px;
-            font-weight: bold;
-            color: #0f172a;
-            background: #f8fafc;
-            min-width: 280px;
+            font-size: 16px;
+            font-family: 'Arial', sans-serif;
+            direction: ltr;
         }
 
-        .pack-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 6px;
-        }
+        .batch-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
         .action-btn {
-            padding: 12px 16px;
+            padding: 12px 14px;
             border-radius: 14px;
             border: none;
-            font-family: var(--ui-font);
             font-size: 16px;
             font-weight: bold;
+            font-family: 'Arial', sans-serif;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: transform 0.15s;
+            transition: transform 0.1s;
         }
 
-        .action-btn:active { transform: scale(0.95); }
-        .btn-primary { background: #1d6fa5; color: #fff; }
-        .btn-success { background: #1b8a4b; color: #fff; }
+        .action-btn:active { transform: scale(0.97); }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-emerald { background: #059669; color: #fff; }
         .btn-amber { background: #d97706; color: #fff; }
+        .btn-purple { background: #7c3aed; color: #fff; }
+        .btn-danger { background: #dc2626; color: #fff; }
         .btn-slate { background: #475569; color: #fff; }
-        .btn-danger { background: #d9381e; color: #fff; }
 
-        #preload-progress-wrap {
-            display: none;
-            margin-top: 8px;
+        .status-console {
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 15px;
+            min-height: 68px;
+            max-height: 110px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 14px;
             background: #e2e8f0;
-            height: 22px;
-            border-radius: 11px;
+            border-radius: 10px;
             overflow: hidden;
         }
 
-        #preload-progress-bar {
-            height: 100%;
+        #batch-progress-bar {
             width: 0%;
-            background: linear-gradient(90deg, #1d6fa5, #1b8a4b);
-            transition: width 0.2s;
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s;
         }
 
-        #preload-status-text {
-            font-size: 15px;
-            font-weight: bold;
-            color: #1e293b;
-            margin-top: 4px;
-            text-align: center;
-        }
-
-        #complete-stars {
-            font-size: 64px;
-            letter-spacing: 12px;
-            margin: 15px 0;
-        }
-
-        /* شارة حالة الصوت الفورية */
-        #tts-toast {
+        #toast-banner {
             position: absolute;
-            bottom: 12px;
-            right: 16px;
-            background: rgba(24, 43, 58, 0.85);
+            bottom: 18px;
+            right: 24px;
+            background: #0f172a;
             color: #fff;
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: 14px;
+            font-size: 16px;
             font-weight: bold;
-            z-index: 25;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
+            z-index: 60;
+            display: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <!-- خلفية مدمجة مصممة خصيصاً لذوي صعوبات التعلم: ألوان باستيل هادئة، خالية من التشتيت البصري، وتباين مريح للعين -->
-        <svg id="ld-friendly-bg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="calmSky" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#dfeff0" />
-                    <stop offset="60%" stop-color="#eef6f4" />
-                    <stop offset="100%" stop-color="#f7f5eb" />
-                </linearGradient>
-                <linearGradient id="softHillBack" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#b8d8be" />
-                    <stop offset="100%" stop-color="#a3cbb1" />
-                </linearGradient>
-                <linearGradient id="softHillFront" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#94bfa2" />
-                    <stop offset="100%" stop-color="#7aa98c" />
-                </linearGradient>
-            </defs>
-            <!-- سماء هادئة مريحة للعين -->
-            <rect width="1280" height="720" fill="url(#calmSky)" />
-            <!-- شمس دافئة خفيفة التباين في الزاوية -->
-            <circle cx="140" cy="120" r="65" fill="#faecc8" opacity="0.65" />
-            <!-- سحب انسيابية هادئة جداً -->
-            <g fill="#ffffff" opacity="0.65">
-                <rect x="240" y="95" width="170" height="44" rx="22" />
-                <circle cx="290" cy="95" r="28" />
-                <circle cx="345" cy="90" r="34" />
-                <rect x="920" y="110" width="190" height="46" rx="23" />
-                <circle cx="975" cy="110" r="30" />
-                <circle cx="1035" cy="104" r="36" />
-            </g>
-            <!-- تلال طبيعية ناعمة في الأسفل تعطي استقراراً بصرياً للطفل -->
-            <path d="M0,560 Q320,475 680,545 T1280,510 L1280,720 L0,720 Z" fill="url(#softHillBack)" />
-            <path d="M0,610 Q420,540 860,605 T1280,575 L1280,720 L0,720 Z" fill="url(#softHillFront)" />
-            <!-- إطار خشبي دافئ خفيف يحيط باللوح -->
-            <rect x="6" y="6" width="1268" height="708" rx="14" fill="none" stroke="#c8b698" stroke-width="12" opacity="0.45" />
-        </svg>
+<div id="game-container">
+    <!-- خلفية SVG هادئة ومريحة لذوي صعوبات التعلم -->
+    <svg class="ld-bg-decor" viewBox="0 0 1280 720" preserveAspectRatio="none">
+        <circle cx="1150" cy="110" r="65" fill="#fef08a" opacity="0.65"/>
+        <g fill="#ffffff" opacity="0.65">
+            <ellipse cx="240" cy="130" rx="95" ry="34"/>
+            <ellipse cx="290" cy="120" rx="70" ry="38"/>
+            <ellipse cx="880" cy="160" rx="110" ry="35"/>
+        </g>
+        <path d="M0,590 Q340,510 680,580 T1280,550 L1280,720 L0,720 Z" fill="#bbf7d0" opacity="0.65"/>
+        <path d="M0,635 Q450,575 920,635 T1280,615 L1280,720 L0,720 Z" fill="#86efac" opacity="0.55"/>
+    </svg>
 
-        <!-- مؤشر حالة محرك الصوت -->
-        <div id="tts-toast">🔊 جاهز</div>
-
-        <!-- ================= شاشة القائمة الرئيسية ================= -->
-        <div id="menu-screen">
-            <div id="top-bar">
-                <div id="stars-count">⭐ 0 / 132</div>
-                <div id="progress-bg"><div id="progress-fill"></div></div>
-                <div id="top-controls">
-                    <button class="top-btn" id="bg-toggle-btn" title="تبديل الخلفية">🎨 خلفية مريحة</button>
-                    <button class="top-btn" id="gender-btn" title="تبديل صيغة التشجيع (طلاب / طالبات)">👧 طالبات</button>
-                    <button class="top-btn" id="audio-settings-btn" title="محرك صوت جوجل والحفظ أوفلاين">🔊 الصوت والأوفلاين</button>
-                    <button class="top-btn icon-only" id="reset-btn" title="إعادة تعيين النجوم">🔄</button>
-                    <button class="top-btn icon-only" id="fullscreen-btn" title="ملء الشاشة">⛶</button>
-                </div>
-            </div>
-
-            <button id="prev-page" class="nav-arrow" aria-label="السابق">‹</button>
-            <button id="next-page" class="nav-arrow" aria-label="التالي">›</button>
-            <div id="menu-header">اختر المرحلة</div>
-            <div id="level-grid"></div>
-            <div id="page-indicator">صفحة 1 من 6</div>
-        </div>
-
-        <!-- ================= شاشة التهجئة ================= -->
-        <div id="game-screen">
-            <div class="top-game-hud">
-                <div id="level-progress">
-                    <span>المرحلة: <strong id="level-num">1</strong></span>
-                    <span>|</span>
-                    <span>الكلمة: <strong id="word-step-num">1 / 2</strong></span>
-                </div>
-                <button class="back-btn" id="back-btn">رجوع</button>
-            </div>
-
-            <!-- عرض الكلمة فقط بخط Arial الواضح وبدون أي مربعات تحتها -->
-            <div id="word-container">
-                <word id="word-display"></word>
-            </div>
-
-            <div id="controls-area">
-                <button id="listen-btn" title="استمع للكلمة">🔊</button>
-            </div>
-
-            <!-- الدوائر الملونة بدون ح1، ح2، ح3 بداخلها -->
-            <div id="circles-container">
-                <div id="circle1" class="circle circle-red visible" aria-label="الحرف الأول"></div>
-                <div id="circle2" class="circle circle-green" aria-label="الحرف الثاني"></div>
-                <div id="circle3" class="circle circle-blue" aria-label="الحرف الثالث"></div>
-            </div>
-
-            <button id="next-word-btn">← التالي</button>
-        </div>
-
-        <!-- ================= شاشة الاختبار ================= -->
-        <div id="test-screen">
-            <div class="top-game-hud">
-                <div id="test-progress-badge" style="color:#fff;font-size:22px;font-weight:bold;background:var(--dark-glass);padding:10px 24px;border-radius:16px;">
-                    اختبار المرحلة: <span id="test-q-counter">1 / 2</span>
-                </div>
-                <button class="back-btn" id="test-back-btn">رجوع</button>
-            </div>
-
-            <div id="test-header">
-                <button id="speak-q-btn" title="إعادة سماع السؤال">🔊</button>
-                <div id="test-prompt-text">اضغط لسماع الكلمة المطلوبة</div>
-            </div>
-
-            <div id="test-options"></div>
-            <div id="feedback-banner"></div>
-
-            <div id="confirm-btn-area">
-                <button id="confirm-btn">تأكيد الإجابة</button>
-            </div>
-        </div>
-
-        <!-- ================= نافذة نهاية المرحلة ================= -->
-        <div id="level-complete" class="modal-overlay">
-            <div class="modal-box" style="max-width: 480px;">
-                <div class="modal-title" id="complete-title">أحسنتِ! انتهت المرحلة</div>
-                <div id="complete-stars">⭐⭐⭐</div>
-                <div class="modal-subtitle" id="complete-msg" style="font-size:22px;font-weight:bold;">لقد أحرزتِ تقدماً رائعاً</div>
-                <div style="display:flex;gap:12px;justify-content:center;">
-                    <button class="action-btn btn-primary" id="complete-btn" style="font-size:22px;padding:14px 30px;">العودة للقائمة</button>
-                    <button class="action-btn btn-success" id="next-level-btn" style="font-size:22px;padding:14px 30px;">المرحلة التالية ←</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= نافذة تأكيد إعادة ضبط النجوم ================= -->
-        <div id="reset-modal" class="modal-overlay">
-            <div class="modal-box" style="max-width: 460px;">
-                <div class="modal-title">إعادة تعيين التقدم 🔄</div>
-                <div class="modal-subtitle" style="font-size:20px;">هل ترغب في مسح جميع النجوم المحفوظة والبدء من جديد؟</div>
-                <div style="display:flex;gap:14px;justify-content:center;">
-                    <button class="action-btn btn-danger" id="confirm-reset-yes" style="padding:12px 30px;font-size:20px;">نعم، مسح النجوم</button>
-                    <button class="action-btn btn-slate" id="confirm-reset-no" style="padding:12px 30px;font-size:20px;">إلغاء</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= نافذة إعدادات الصوت الاحترافي (جوجل + أوفلاين) ================= -->
-        <div id="audio-modal" class="modal-overlay">
-            <div class="modal-box" style="max-width: 780px;">
-                <div class="modal-title">🔊 استوديو صوت Google Gemini Natural TTS الموحد</div>
-                <div class="modal-subtitle">
-                    يعتمد التطبيق حصرياً على محرك <strong>Google Gemini 2.5 Flash Natural TTS</strong> بصوت استوديو واحد موحد وطبيعي تماماً، ويقرأ تلقائياً ملف <code>audio_pack.json</code> أو <code>audio_pack.js</code> الموجود بجانب <code>index.html</code>.
-                </div>
-
-                <div class="audio-settings-grid">
-                    <div class="setting-row">
-                        <span class="setting-label">1. مفتاح Google AI Studio (Gemini API Key):</span>
-                        <input type="password" id="gemini-api-key-input" class="input-control" style="min-width:330px;" placeholder="الصق مفتاح AIzaSy... هنا لتوليد الأصوات">
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">2. شخصية الصوت الموحد (Gemini Studio Voice):</span>
-                        <select id="gemini-voice-select" class="select-control">
-                            <option value="Kore">Kore - صوت معلمة واضح ودافئ (موصى به جداً)</option>
-                            <option value="Zephyr">Zephyr - صوت مشرق وواضح المخارج</option>
-                            <option value="Leda">Leda - صوت لطيف وهادئ للأطفال</option>
-                            <option value="Aoede">Aoede - صوت رخيم ومتأنٍ</option>
-                            <option value="Puck">Puck - صوت حيوي ومشجع</option>
-                            <option value="Charon">Charon - صوت معلم رخيم وواضح</option>
-                        </select>
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">3. أسلوب نطق الحروف المفردة بالفتحة:</span>
-                        <select id="phonetic-mode-select" class="select-control">
-                            <option value="fatha_natural">فتحة واضحة مشبعة (كَـا / تَـا / بَـا) - الأنسب لصعوبات التعلم</option>
-                            <option value="short">صوت الحرف المفتوح القصير (كَ / تَ / بَ)</option>
-                        </select>
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">4. حالة الحزمة الصوتية الموحدة (Offline):</span>
-                        <span id="cache-count-badge" style="font-weight:bold;color:#1b8a4b;font-size:16px;">0 ملف صوتي محفوظ أوفلاين</span>
-                    </div>
-
-                    <div class="pack-actions" style="grid-template-columns: 1fr 1fr 1fr;">
-                        <button class="action-btn btn-danger" id="clear-old-audio-btn" title="احذف الأصوات القديمة غير الموحدة أولاً">🗑️ مسح الأصوات القديمة</button>
-                        <button class="action-btn btn-success" id="preload-all-btn">⚡ توليد حزمة Gemini كاملة</button>
-                        <button class="action-btn btn-primary" id="test-voice-btn">🔊 تجربة ("كَ - تَ - بَ")</button>
-                    </div>
-
-                    <div class="pack-actions" style="grid-template-columns: 1fr 1fr; margin-top: 4px;">
-                        <button class="action-btn btn-amber" id="export-pack-btn" title="احفظه باسم audio_pack.json بجانب ملف index.html">💾 تنزيل audio_pack.json</button>
-                        <button class="action-btn btn-amber" id="export-js-pack-btn" style="background:#b45309;" title="احفظه باسم audio_pack.js بجانب index.html ليعمل مباشرة بدون خادم">📦 تنزيل audio_pack.js (للملفات المحلية)</button>
-                        <button class="action-btn btn-primary" id="export-standalone-html-btn" style="background:#0f766e;">🚀 حزم اللعبة + الأصوات في ملف HTML واحد</button>
-                        <button class="action-btn btn-slate" id="import-pack-btn">📂 استيراد ملف audio_pack.json يدويًا</button>
-                    </div>
-                    <input type="file" id="import-pack-input" accept=".json,.js" style="display:none;">
-
-                    <div id="preload-progress-wrap">
-                        <div id="preload-progress-bar"></div>
-                    </div>
-                    <div id="preload-status-text"></div>
-                </div>
-
-                <button class="action-btn btn-primary" id="close-audio-modal" style="width:100%;font-size:20px;padding:12px;">حفظ الإعدادات وإغلاق ✓</button>
-            </div>
+    <!-- الشريط العلوي -->
+    <div id="top-bar">
+        <div id="stars-count">⭐ 0 / 132</div>
+        <div id="progress-bg"><div id="progress-fill"></div></div>
+        <div id="top-controls">
+            <button class="top-pill-btn gemini-missing" id="open-gemini-modal-btn">
+                <span>🎙️</span>
+                <span id="audio-pack-status-text">تجهيز صوت Gemini (0%)</span>
+            </button>
+            <button class="top-pill-btn" id="gender-toggle-btn" title="تبديل صيغة التشجيع">👧 طالبات</button>
+            <button class="top-icon-btn" id="reset-btn" title="إعادة تعيين النجوم">🔄</button>
+            <button class="top-icon-btn" id="fullscreen-btn" title="ملء الشاشة">⛶</button>
         </div>
     </div>
 
-    <script>
-        // ============================================================================
-        // 1. بيانات الكلمات (88 كلمة موزعة على 44 مرحلة)
-        // ============================================================================
-        const rawData = `كَتَبَ;كَ;تَ;بَ
+    <!-- شاشة القائمة -->
+    <div id="menu-screen">
+        <button id="prev-page" class="nav-arrow">‹</button>
+        <button id="next-page" class="nav-arrow">›</button>
+        <div id="menu-header">اختر المرحلة</div>
+        <div id="level-grid"></div>
+    </div>
+
+    <!-- شاشة التهجئة -->
+    <div id="game-screen">
+        <div class="screen-top-nav">
+            <button id="back-btn">✖ خروج للقائمة</button>
+            <div class="level-badge-info">
+                <span>المرحلة: <span id="level-num">1</span> (<span id="word-step-num">1</span>/2)</span>
+                <button class="quick-gen-level-btn" id="gen-this-level-btn">⚡ توليد صوت المرحلة (طلب 1)</button>
+            </div>
+        </div>
+
+        <div id="word-container">
+            <word id="word-display"></word>
+        </div>
+
+        <div id="circles-container">
+            <div id="circle1" class="circle circle-red visible"></div>
+            <div id="circle2" class="circle circle-green"></div>
+            <div id="circle3" class="circle circle-blue"></div>
+        </div>
+
+        <div id="controls-area">
+            <button id="listen-btn" title="استمع للكلمة كاملة">🔊</button>
+        </div>
+        <button id="next-word-btn">← التالي</button>
+    </div>
+
+    <!-- شاشة الاختبار -->
+    <div id="test-screen">
+        <div class="screen-top-nav">
+            <button id="test-back-btn">✖ خروج للقائمة</button>
+            <div class="level-badge-info">اختبار المرحلة: <span id="test-level-num">1</span></div>
+        </div>
+
+        <div id="test-header">
+            <span id="test-prompt-label">استمع ثم اختر الكلمة الصحيحة:</span>
+            <button id="speak-q-btn" title="إعادة سماع السؤال">🔊</button>
+        </div>
+        <div id="test-options"></div>
+        <div id="confirm-btn-area">
+            <button id="confirm-btn">تأكيد الإجابة ✔</button>
+        </div>
+    </div>
+
+    <!-- شاشة إنهاء المرحلة -->
+    <div id="level-complete">
+        <div id="complete-box">
+            <div id="complete-title">انتهت المرحلة!</div>
+            <div id="complete-stars"></div>
+            <div id="complete-msg">لقد أحرزت تقدماً رائعاً</div>
+            <button id="complete-btn">العودة للقائمة</button>
+        </div>
+    </div>
+
+    <!-- نافذة استوديو صوت Google Gemini Natural TTS -->
+    <div id="gemini-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>🎙️ استوديو صوت Google Gemini Natural TTS (نظام الدفعات الذكي)</h2>
+                <button class="close-modal-btn" id="close-gemini-modal">✖</button>
+            </div>
+
+            <div class="quota-alert">
+                💡 <strong>لماذا ظهر خطأ 429 سابقاً؟</strong> لأن Google AI Studio يسمح بـ <strong>3 طلبات فقط في الدقيقة</strong> لمحرك الصوت.<br>
+                ✅ <strong>الحل الجديد هنا:</strong> يدمج النظام عدة كلمات وحروف في <strong>طلب صوتي واحد</strong> ثم يقطعها تلقائياً بدقة الموجة الصوتية!
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label>🔑 مفتاح Google AI Studio API Key (يبدأ بـ AIza...):</label>
+                    <input type="password" id="gemini-api-key-input" placeholder="AIzaSy...">
+                </div>
+                <div class="input-group">
+                    <label>🗣️ الشخصية الصوتية الموحدة:</label>
+                    <select id="gemini-voice-select">
+                        <option value="Kore">Kore (صوت نسائي دافئ وواضح للمعلمة)</option>
+                        <option value="Zephyr">Zephyr (صوت نسائي هادئ ومشرق)</option>
+                        <option value="Puck">Puck (صوت رجالي حيوي وواضح)</option>
+                        <option value="Charon">Charon (صوت رجالي رزين وعميق)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="progress-bar-wrap">
+                <div id="batch-progress-bar"></div>
+            </div>
+
+            <div class="status-console" id="gemini-console-log">
+                جاهز. أدخل مفتاح API أو قم باستيراد ملف حزمة صوتية (audio_pack.json) محفوظ مسبقاً.
+            </div>
+
+            <div class="batch-actions-grid">
+                <button class="action-btn btn-emerald" id="btn-gen-current-page">⚡ توليد مراحل هذه الصفحة (8 مراحل)</button>
+                <button class="action-btn btn-primary" id="btn-gen-all-smart">🚀 توليد اللعبة كاملة (مع احترام حصة 429)</button>
+                <button class="action-btn btn-amber" id="btn-stop-gen">⏹️ إيقاف التوليد المؤقت</button>
+            </div>
+
+            <div class="batch-actions-grid">
+                <button class="action-btn btn-purple" id="btn-export-json">💾 تنزيل audio_pack.json</button>
+                <button class="action-btn btn-slate" id="btn-import-json">📂 استيراد ملف audio_pack.json</button>
+                <button class="action-btn btn-emerald" id="btn-export-single-html">📦 تصدير لعبة HTML شاملة الأصوات</button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                <button class="action-btn btn-slate" id="btn-try-autoload-json" style="font-size:14px; padding:8px 14px;">🔍 فحص وجود audio_pack.json بجانب الملف الآن</button>
+                <button class="action-btn btn-danger" id="btn-clear-db" style="font-size:14px; padding:8px 14px;">🗑️ مسح جميع الأصوات المخزنة</button>
+            </div>
+            <input type="file" id="import-json-file-input" accept=".json" style="display:none">
+        </div>
+    </div>
+
+    <div id="toast-banner"></div>
+</div>
+
+<!-- مكان مخصص لحقن الحزمة الصوتية المدمجة عند تصدير ملف HTML شامل -->
+<script id="embedded-audio-pack" type="application/json">{}</script>
+<script>
+    // ================== 1. بيانات الكلمات والمراحل ==================
+    const rawData = `كَتَبَ;كَ;تَ;بَ
 نَكَبَ;نَ;كَ;بَ
 نَبَتَ;نَ;بَ;تَ
 ثَبَتَ;ثَ;بَ;تَ
@@ -1097,1245 +983,1089 @@
 أَخَذَ;أَ;خَ;ذَ
 يَبَسَ;يَ;بَ;سَ`;
 
-        const allWords = rawData.trim().split('\n').map(line => {
-            const parts = line.trim().split(';');
-            return { full: parts[0], l1: parts[1], l2: parts[2], l3: parts[3] };
+    const allWords = rawData.split('\n').map(line => {
+        const parts = line.trim().split(';');
+        return { full: parts[0], l1: parts[1], l2: parts[2], l3: parts[3] };
+    });
+
+    const TOTAL_LEVELS = 44, WORDS_PER_LEVEL = 2, MAX_STARS = TOTAL_LEVELS * 3;
+    const levels = [];
+    for (let i = 0; i < TOTAL_LEVELS; i++) {
+        const startIdx = i * WORDS_PER_LEVEL;
+        levels.push({ words: allWords.slice(startIdx, startIdx + WORDS_PER_LEVEL), stars: 0 });
+    }
+
+    // تنظيف الحرف من التطويل (ـ) لتوحيد مفتاح الصوت في قاعدة البيانات
+    function normalizeAudioKey(text) {
+        if (!text) return '';
+        return text.replace(/ـ/g, '').trim();
+    }
+
+    function getPhoneticPromptText(cleanKey) {
+        if (cleanKey.length <= 2) {
+            return cleanKey;
+        }
+        return cleanKey;
+    }
+
+    // عبارات التشجيع المختصرة لتقليل حجم الحزمة وتوحيد الصوت
+    let isFemaleStudent = localStorage.getItem('spelling_student_gender') !== 'male';
+    const praiseListFemale = ["أَحْسَنْتِ", "مُمْتَازَة", "رَائِعَة"];
+    const retryListFemale  = ["حَاوِلِي مَرَّةً أُخْرَى"];
+    const praiseListMale   = ["أَحْسَنْتَ", "مُمْتَاز", "رَائِع"];
+    const retryListMale    = ["حَاوِلْ مَرَّةً أُخْرَى"];
+
+    function getAllUniqueGameAudioKeys() {
+        const set = new Set();
+        allWords.forEach(w => {
+            set.add(normalizeAudioKey(w.l1));
+            set.add(normalizeAudioKey(w.l2));
+            set.add(normalizeAudioKey(w.l3));
+            set.add(normalizeAudioKey(w.full));
         });
+        [...praiseListFemale, ...retryListFemale, ...praiseListMale, ...retryListMale].forEach(p => set.add(normalizeAudioKey(p)));
+        return Array.from(set);
+    }
 
-        const TOTAL_LEVELS = 44;
-        const WORDS_PER_LEVEL = 2;
-        const MAX_STARS = TOTAL_LEVELS * 3;
-        const levels = [];
+    // ================== 2. قاعدة البيانات المحلية IndexedDB + الذاكرة السريعة ==================
+    const DB_NAME = 'GeminiSpellingAudioDB_v3';
+    const STORE_NAME = 'audio_clips';
+    const memoryAudioCache = new Map();
 
-        for (let i = 0; i < TOTAL_LEVELS; i++) {
-            const startIdx = i * WORDS_PER_LEVEL;
-            levels.push({
-                words: allWords.slice(startIdx, startIdx + WORDS_PER_LEVEL),
-                stars: 0
-            });
-        }
+    function openAudioDB() {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open(DB_NAME, 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    }
 
-        function loadStars() {
-            for (let i = 0; i < TOTAL_LEVELS; i++) {
-                const saved = localStorage.getItem(`level_${i}_stars`);
-                if (saved !== null) levels[i].stars = parseInt(saved, 10) || 0;
-            }
-        }
-        loadStars();
-
-        // ============================================================================
-        // 2. معالجة الحروف العربية واتصالها السليم بخط Arial لذوي صعوبات التعلم
-        // ============================================================================
-        const nonConnectingLetters = ['ا', 'أ', 'آ', 'إ', 'د', 'ذ', 'ر', 'ز', 'و', 'ؤ', 'ء'];
-
-        // بناء الكلمة المتصلة بخط Arial مع تلوين كل حرف بشكل مستقل ومتصل تماماً
-        function buildColoredWordHTML(wordObj, activeIndex = 0) {
-            const clean1 = wordObj.l1.replace(/ـ+/g, '');
-            const clean2 = wordObj.l2.replace(/ـ+/g, '');
-            const clean3 = wordObj.l3.replace(/ـ+/g, '');
-
-            const connectsAfter1 = !nonConnectingLetters.some(ch => clean1.includes(ch));
-            const connectsAfter2 = !nonConnectingLetters.some(ch => clean2.includes(ch));
-
-            const ZWJ = '\u200D';
-            const s1 = connectsAfter1 ? (clean1 + ZWJ) : clean1;
-            const s2 = (connectsAfter1 ? ZWJ : '') + clean2 + (connectsAfter2 ? ZWJ : '');
-            const s3 = (connectsAfter2 ? ZWJ : '') + clean3;
-
-            const c1Class = activeIndex === 1 ? 'syl syl-1 syl-active' : 'syl syl-1';
-            const c2Class = activeIndex === 2 ? 'syl syl-2 syl-active' : 'syl syl-2';
-            const c3Class = activeIndex === 3 ? 'syl syl-3 syl-active' : 'syl syl-3';
-
-            return `<c1 class="${c1Class}">${s1}</c1><c2 class="${c2Class}">${s2}</c2><c3 class="${c3Class}">${s3}</c3>`;
-        }
-
-        // ============================================================================
-        // 3. محرك Google Gemini Natural TTS الموحد والحصري + القراءة التلقائية لـ audio_pack.json
-        // ============================================================================
-        let geminiVoiceName = localStorage.getItem('smartboard_gemini_voice') || 'Kore';
-        let phoneticMode = localStorage.getItem('smartboard_phonetic_mode') || 'fatha_natural';
-        let customGeminiKey = localStorage.getItem('smartboard_gemini_key') || '';
-        let isFemaleStudent = (localStorage.getItem('smartboard_gender') || 'female') === 'female';
-        let useCustomBgImage = localStorage.getItem('smartboard_bg_mode') === 'custom';
-
-        const memoryAudioCache = new Map(); // key -> data:audio/wav;base64,...
-        let dbInstance = null;
-        let currentAudioElement = null;
-        let audioCtx = null;
-        let isPreloadingPack = false;
-
-        // فتح قاعدة بيانات IndexedDB لحفظ أصوات Gemini الموحدة على اللوح الذكي
-        function initIndexedDB() {
+    async function loadAllFromDBToMemory() {
+        try {
+            const db = await openAudioDB();
             return new Promise((resolve) => {
-                if (!window.indexedDB) { resolve(null); return; }
-                const req = indexedDB.open('SpellingGameGeminiUnifiedAudioDB_v3', 1);
-                req.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains('audios')) {
-                        db.createObjectStore('audios', { keyPath: 'key' });
-                    }
-                };
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.openCursor();
                 req.onsuccess = (e) => {
-                    dbInstance = e.target.result;
-                    loadAllCachedAudiosToMemory().then(() => resolve(dbInstance));
-                };
-                req.onerror = () => resolve(null);
-            });
-        }
-
-        async function loadAllCachedAudiosToMemory() {
-            if (!dbInstance) return;
-            return new Promise((resolve) => {
-                try {
-                    const tx = dbInstance.transaction('audios', 'readonly');
-                    const store = tx.objectStore('audios');
-                    const req = store.getAll();
-                    req.onsuccess = () => {
-                        const list = req.result || [];
-                        list.forEach(item => {
-                            if (item.key && item.dataUrl) {
-                                memoryAudioCache.set(item.key, item.dataUrl);
-                            }
-                        });
-                        updateCacheCountUI();
-                        resolve();
-                    };
-                    req.onerror = () => resolve();
-                } catch (e) { resolve(); }
-            });
-        }
-
-        async function saveAudioToCache(key, dataUrl) {
-            memoryAudioCache.set(key, dataUrl);
-            updateCacheCountUI();
-            if (!dbInstance) return;
-            return new Promise((resolve) => {
-                try {
-                    const tx = dbInstance.transaction('audios', 'readwrite');
-                    tx.objectStore('audios').put({ key, dataUrl });
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => resolve(false);
-                } catch (e) { resolve(false); }
-            });
-        }
-
-        async function clearAllAudioCache() {
-            memoryAudioCache.clear();
-            updateCacheCountUI();
-            if (!dbInstance) return;
-            return new Promise((resolve) => {
-                try {
-                    const tx = dbInstance.transaction('audios', 'readwrite');
-                    tx.objectStore('audios').clear();
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => resolve(false);
-                } catch (e) { resolve(false); }
-            });
-        }
-
-        // قراءة حزمة الأصوات المخزنة بجانب ملف HTML تلقائياً (سواء عبر audio_pack.json أو audio_pack.js أو الحزمة المدمجة)
-        async function autoLoadAdjacentAudioPack() {
-            let loadedCount = 0;
-
-            // 1. فحص وجود window.PRELOADED_AUDIO_PACK (من ملف audio_pack.js أو النسخة المدمجة)
-            if (window.PRELOADED_AUDIO_PACK && typeof window.PRELOADED_AUDIO_PACK === 'object') {
-                const entries = Object.entries(window.PRELOADED_AUDIO_PACK);
-                for (const [k, v] of entries) {
-                    if (v && typeof v === 'string') {
-                        memoryAudioCache.set(k, v);
-                        await saveAudioToCache(k, v);
-                        loadedCount++;
-                    }
-                }
-                if (loadedCount > 0) {
-                    updateCacheCountUI();
-                    showToast(`🔊 تم تحميل ${loadedCount} صوتاً تلقائياً من الحزمة المرفقة`);
-                    return loadedCount;
-                }
-            }
-
-            // 2. محاولة جلب ملف ./audio_pack.json الموجود في نفس المجلد بجانب index.html مباشرة
-            const candidatePaths = ['./audio_pack.json', 'audio_pack.json', './smartboard-arabic-spelling-audio.json'];
-            for (const path of candidatePaths) {
-                try {
-                    const res = await fetch(path, { cache: 'no-cache' });
-                    if (res.ok) {
-                        const data = await res.json();
-                        const entries = Object.entries(data || {});
-                        for (const [k, v] of entries) {
-                            if (v && typeof v === 'string') {
-                                memoryAudioCache.set(k, v);
-                                await saveAudioToCache(k, v);
-                                loadedCount++;
-                            }
-                        }
-                        if (loadedCount > 0) {
-                            updateCacheCountUI();
-                            showToast(`🔊 تم قراءة ${path} تلقائياً (${loadedCount} صوت)`);
-                            return loadedCount;
-                        }
-                    }
-                } catch (e) {
-                    // يتجاهل الخطأ بهدوء إذا لم يوجد الملف أو كان المتصفح يمنع fetch عبر file://
-                }
-            }
-            return loadedCount;
-        }
-
-        function updateCacheCountUI() {
-            const totalRequired = collectAllGameAudioItems().length;
-            const count = memoryAudioCache.size;
-            const badge = document.getElementById('cache-count-badge');
-            const topBtn = document.getElementById('audio-settings-btn');
-            if (badge) badge.innerText = `${count} من ${totalRequired} ملف صوتي محفوظ أوفلاين`;
-            if (topBtn) {
-                if (count >= totalRequired * 0.9) {
-                    topBtn.classList.add('audio-ready');
-                    topBtn.innerHTML = `🔊 صوت Gemini جاهز (${count})`;
-                } else {
-                    topBtn.classList.remove('audio-ready');
-                    topBtn.innerHTML = `🔊 استوديو صوت Gemini (${count}/${totalRequired})`;
-                }
-            }
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('tts-toast');
-            if (!toast) return;
-            toast.innerText = msg;
-            toast.style.opacity = '1';
-            clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 2600);
-        }
-
-        // خريطة النطق الصوتي الفصيح للحروف المفتوحة لضمان قراءة صوت الحرف بالفتحة ("كَ") وليس اسم الحرف ("كاف")
-        const letterPhoneticMap = {
-            'أ': 'أَ', 'ا': 'أَ', 'ب': 'بَ', 'ت': 'تَ', 'ث': 'ثَ',
-            'ج': 'جَ', 'ح': 'حَ', 'خ': 'خَ', 'د': 'دَ', 'ذ': 'ذَ',
-            'ر': 'رَ', 'ز': 'زَ', 'س': 'سَ', 'ش': 'شَ', 'ص': 'صَ',
-            'ض': 'ضَ', 'ط': 'طَ', 'ظ': 'ظَ', 'ع': 'عَ', 'غ': 'غَ',
-            'ف': 'فَ', 'ق': 'قَ', 'ك': 'كَ', 'ل': 'لَ', 'م': 'مَ',
-            'ن': 'نَ', 'ه': 'هَ', 'و': 'وَ', 'ي': 'يَ'
-        };
-
-        function normalizeForTTS(rawText, isSingleSyllable = false) {
-            if (!rawText) return '';
-            let cleaned = rawText.replace(/ـ+/g, '').replace(/[\u200B-\u200F\uFEFF]/g, '').trim();
-
-            if (isSingleSyllable) {
-                const baseChar = cleaned.replace(/[\u064B-\u065F]/g, '').charAt(0);
-                if (baseChar && letterPhoneticMap[baseChar]) {
-                    if (phoneticMode === 'fatha_natural') {
-                        return baseChar === 'أ' ? 'آ' : `${baseChar}\u064E\u0627`;
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        memoryAudioCache.set(cursor.key, cursor.value);
+                        cursor.continue();
                     } else {
-                        return `${baseChar}\u064E`;
+                        updateAudioPackUIStatus();
+                        resolve();
+                    }
+                };
+                req.onerror = () => resolve();
+            });
+        } catch (err) {
+            console.warn('IndexedDB load warning:', err);
+        }
+    }
+
+    async function saveAudioClipToDB(key, wavDataUrl) {
+        const cleanKey = normalizeAudioKey(key);
+        memoryAudioCache.set(cleanKey, wavDataUrl);
+        try {
+            const db = await openAudioDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).put(wavDataUrl, cleanKey);
+        } catch (e) {}
+    }
+
+    async function clearAllAudioFromDB() {
+        memoryAudioCache.clear();
+        try {
+            const db = await openAudioDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).clear();
+        } catch (e) {}
+        updateAudioPackUIStatus();
+        renderMenu(currentMenuPage);
+    }
+
+    function isLevelFullyCached(levelIdx) {
+        const lv = levels[levelIdx];
+        if (!lv) return false;
+        for (const w of lv.words) {
+            if (!memoryAudioCache.has(normalizeAudioKey(w.l1))) return false;
+            if (!memoryAudioCache.has(normalizeAudioKey(w.l2))) return false;
+            if (!memoryAudioCache.has(normalizeAudioKey(w.l3))) return false;
+            if (!memoryAudioCache.has(normalizeAudioKey(w.full))) return false;
+        }
+        return true;
+    }
+
+    function updateAudioPackUIStatus() {
+        const allKeys = getAllUniqueGameAudioKeys();
+        let cachedCount = 0;
+        allKeys.forEach(k => { if (memoryAudioCache.has(k)) cachedCount++; });
+        const pct = Math.round((cachedCount / allKeys.length) * 100);
+        const btn = document.getElementById('open-gemini-modal-btn');
+        const txt = document.getElementById('audio-pack-status-text');
+        txt.innerText = `صوت Gemini (${pct}% جاهز أوفلاين)`;
+        if (pct >= 95) {
+            btn.classList.remove('gemini-missing');
+            btn.classList.add('gemini-ready');
+        } else {
+            btn.classList.remove('gemini-ready');
+            btn.classList.add('gemini-missing');
+        }
+    }
+
+    // ================== 3. معالج الصوت الرقمي (PCM to WAV + Smart Silence Slicer) ==================
+    function pcmInt16ToWavDataUrl(int16Samples, sampleRate = 24000) {
+        const buffer = new ArrayBuffer(44 + int16Samples.length * 2);
+        const view = new DataView(buffer);
+
+        function writeStr(offset, str) {
+            for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+        }
+
+        writeStr(0, 'RIFF');
+        view.setUint32(4, 36 + int16Samples.length * 2, true);
+        writeStr(8, 'WAVE');
+        writeStr(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeStr(36, 'data');
+        view.setUint32(40, int16Samples.length * 2, true);
+
+        let offset = 44;
+        for (let i = 0; i < int16Samples.length; i++, offset += 2) {
+            view.setInt16(offset, int16Samples[i], true);
+        }
+
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        const chunkSize = 8192;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+        }
+        return 'data:audio/wav;base64,' + btoa(binary);
+    }
+
+    function base64ToInt16Samples(base64Pcm) {
+        const binary = atob(base64Pcm);
+        const len = binary.length - (binary.length % 2);
+        const samples = new Int16Array(len / 2);
+        for (let i = 0; i < len; i += 2) {
+            const lo = binary.charCodeAt(i);
+            const hi = binary.charCodeAt(i + 1);
+            let val = (hi << 8) | lo;
+            if (val >= 0x8000) val -= 0x10000;
+            samples[i / 2] = val;
+        }
+        return samples;
+    }
+
+    function slicePcmBySilence(samples, expectedCount, sampleRate = 24000) {
+        if (expectedCount === 1) return [samples];
+
+        const windowSize = Math.floor(sampleRate * 0.02);
+        const numWindows = Math.floor(samples.length / windowSize);
+        const rmsValues = new Float32Array(numWindows);
+        let maxRms = 1;
+
+        for (let w = 0; w < numWindows; w++) {
+            let sumSq = 0;
+            const start = w * windowSize;
+            for (let i = start; i < start + windowSize; i++) {
+                const s = samples[i];
+                sumSq += s * s;
+            }
+            const rms = Math.sqrt(sumSq / windowSize);
+            rmsValues[w] = rms;
+            if (rms > maxRms) maxRms = rms;
+        }
+
+        const thresholds = [0.035, 0.05, 0.025, 0.07, 0.018, 0.09];
+        const mingapWindows = [8, 6, 10, 5, 12];
+
+        let bestSegments = null;
+        let bestDiff = 999;
+
+        for (const minGap of mingapWindows) {
+            for (const ratio of thresholds) {
+                const thresh = Math.max(180, maxRms * ratio);
+                const rawSegments = [];
+                let inSpeech = false;
+                let segStart = 0;
+                let silenceCounter = 0;
+
+                for (let w = 0; w < numWindows; w++) {
+                    if (rmsValues[w] > thresh) {
+                        if (!inSpeech) {
+                            inSpeech = true;
+                            segStart = Math.max(0, w - 2);
+                        }
+                        silenceCounter = 0;
+                    } else if (inSpeech) {
+                        silenceCounter++;
+                        if (silenceCounter >= minGap) {
+                            const segEnd = Math.min(numWindows, w - silenceCounter + 3);
+                            if (segEnd - segStart >= 4) {
+                                rawSegments.push([segStart * windowSize, segEnd * windowSize]);
+                            }
+                            inSpeech = false;
+                        }
                     }
                 }
+                if (inSpeech) {
+                    rawSegments.push([segStart * windowSize, samples.length]);
+                }
+
+                const diff = Math.abs(rawSegments.length - expectedCount);
+                if (diff < bestDiff) {
+                    bestDiff = diff;
+                    bestSegments = rawSegments;
+                }
+                if (diff === 0) break;
             }
-            return cleaned;
+            if (bestDiff === 0) break;
         }
 
-        // مفتاح موحد وثابت في JSON و IndexedDB لسهولة القراءة المباشرة من audio_pack.json
-        function getCacheKey(rawText, isSingleSyllable = false) {
-            const cleaned = (rawText || '').replace(/ـ+/g, '').replace(/[\u200B-\u200F\uFEFF]/g, '').trim();
-            if (isSingleSyllable) {
-                const baseChar = cleaned.replace(/[\u064B-\u065F]/g, '').charAt(0) || cleaned;
-                return `gemini_syl_${phoneticMode}_${baseChar}`;
+        if (bestSegments && bestSegments.length === expectedCount) {
+            return bestSegments.map(([s, e]) => samples.subarray(s, e));
+        }
+
+        if (bestSegments && bestSegments.length > expectedCount) {
+            let segs = bestSegments.map(pair => [...pair]);
+            while (segs.length > expectedCount) {
+                let minGapIdx = 0;
+                let minGapVal = Infinity;
+                for (let i = 0; i < segs.length - 1; i++) {
+                    const gap = segs[i + 1][0] - segs[i][1];
+                    if (gap < minGapVal) {
+                        minGapVal = gap;
+                        minGapIdx = i;
+                    }
+                }
+                segs[minGapIdx][1] = segs[minGapIdx + 1][1];
+                segs.splice(minGapIdx + 1, 1);
             }
-            return `gemini_word_${cleaned}`;
+            return segs.map(([s, e]) => samples.subarray(s, e));
         }
 
-        // تحويل PCM16 القادم من Gemini 2.5 Flash TTS إلى ملف WAV قياسي قابل للحفظ والتشغيل أوفلاين
-        function pcm16Base64ToWavDataUrl(base64Pcm, sampleRate = 24000) {
-            try {
-                const binaryStr = atob(base64Pcm);
-                const len = binaryStr.length;
-                const pcmBytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) pcmBytes[i] = binaryStr.charCodeAt(i);
-
-                const wavHeader = new ArrayBuffer(44);
-                const view = new DataView(wavHeader);
-                const writeStr = (offset, str) => {
-                    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-                };
-
-                writeStr(0, 'RIFF');
-                view.setUint32(4, 36 + pcmBytes.byteLength, true);
-                writeStr(8, 'WAVE');
-                writeStr(12, 'fmt ');
-                view.setUint32(16, 16, true);
-                view.setUint16(20, 1, true); // PCM
-                view.setUint16(22, 1, true); // Mono
-                view.setUint32(24, sampleRate, true);
-                view.setUint32(28, sampleRate * 2, true);
-                view.setUint16(32, 2, true);
-                view.setUint16(34, 16, true);
-                writeStr(36, 'data');
-                view.setUint32(40, pcmBytes.byteLength, true);
-
-                const wavBlob = new Blob([wavHeader, pcmBytes], { type: 'audio/wav' });
-                return blobToDataURL(wavBlob);
-            } catch (e) {
-                return Promise.resolve(null);
-            }
+        const fallback = [];
+        const chunkLen = Math.floor(samples.length / expectedCount);
+        for (let i = 0; i < expectedCount; i++) {
+            fallback.push(samples.subarray(i * chunkLen, (i + 1) * chunkLen));
         }
+        return fallback;
+    }
 
-        function blobToDataURL(blob) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-            });
+    // ================== 4. الاتصال بـ Gemini 2.5 Flash TTS بنظام الدفعات الذكي ==================
+    let stopBatchRequested = false;
+
+    function getCleanApiKey() {
+        const inputEl = document.getElementById('gemini-api-key-input');
+        const val = (inputEl ? inputEl.value : localStorage.getItem('gemini_tts_api_key')) || '';
+        return val.trim();
+    }
+
+    function logToModalConsole(msg) {
+        const box = document.getElementById('gemini-console-log');
+        if (box) box.innerText = msg;
+    }
+
+    function showToast(msg, duration = 3000) {
+        const t = document.getElementById('toast-banner');
+        t.innerText = msg;
+        t.style.display = 'block';
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => { t.style.display = 'none'; }, duration);
+    }
+
+    async function requestGeminiBatchTTS(keysArray, retryAttempt = 0) {
+        const apiKey = getCleanApiKey();
+        if (!apiKey) {
+            throw new Error('يرجى إدخال مفتاح Google AI Studio API Key أولاً.');
         }
+        localStorage.setItem('gemini_tts_api_key', apiKey);
 
-        // توليد الصوت الحصري عبر Google Gemini Natural TTS مع إعادة المحاولة الذكية (Exponential Backoff)
-        async function fetchGeminiNaturalTTSBase64(rawText, isSingleSyllable = false, maxRetries = 3) {
-            const apiKey = (customGeminiKey || "").trim();
-            const spokenText = normalizeForTTS(rawText, isSingleSyllable);
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+        const voiceName = document.getElementById('gemini-voice-select').value || 'Kore';
+        localStorage.setItem('gemini_tts_voice', voiceName);
 
-            // توجيه صوتي دقيق جداً لضمان ثبات النبرة وعدم إضافة أي كلمة خارج النص
-            const promptInstruction = isSingleSyllable
-                ? `انطق هذا المقطع الصوتي العربي المفتوح بوضوح وهدوء كمعلم تأسيس أطفال، دون ذكر اسم الحرف ودون أي كلمة إضافية: "${spokenText}"`
-                : `انطق باللغة العربية الفصحى المشكولة بوضوح وهدوء وبنبرة معلم مشجع للأطفال النص التالي فقط: "${spokenText}"`;
+        const promptItems = keysArray.map(k => getPhoneticPromptText(k));
+        const promptText = `انطق كل مفردة عربية من المفردات التالية بالتشكيل الفصيح الواضح وبنفس النبرة تماماً، واترك وقفة صمت واضحة (نصف ثانية) بين كل مفردة والتي تليها دون إضافة أي كلمة أخرى:\n\n${promptItems.join(' ... \n')}`;
 
-            const payload = {
-                contents: [{ parts: [{ text: promptInstruction }] }],
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }],
                 generationConfig: {
                     responseModalities: ["AUDIO"],
                     speechConfig: {
                         voiceConfig: {
-                            prebuiltVoiceConfig: { voiceName: geminiVoiceName }
+                            prebuiltVoiceConfig: { voiceName }
                         }
                     }
                 }
-            };
+            })
+        });
 
-            for (let attempt = 0; attempt < maxRetries; attempt++) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 12000);
-                    const res = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (res.status === 429) {
-                        // انتظار تدريجي عند تجاوز حد الطلبات في الدقيقة
-                        await new Promise(r => setTimeout(r, 2200 * (attempt + 1)));
-                        continue;
-                    }
-
-                    if (!res.ok) return null;
-                    const result = await res.json();
-                    const part = result?.candidates?.[0]?.content?.parts?.[0];
-                    const audioData = part?.inlineData?.data;
-                    const mimeType = part?.inlineData?.mimeType || '';
-                    if (audioData) {
-                        const rateMatch = mimeType.match(/rate=(\d+)/);
-                        const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
-                        return await pcm16Base64ToWavDataUrl(audioData, sampleRate);
-                    }
-                } catch (e) {
-                    await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        if (response.status === 429) {
+            if (retryAttempt < 3 && !stopBatchRequested) {
+                const waitSec = 22 * (retryAttempt + 1);
+                for (let s = waitSec; s > 0; s--) {
+                    if (stopBatchRequested) throw new Error('تم إيقاف التوليد.');
+                    logToModalConsole(`⏳ تم الوصول لحد الطلبات المؤقت في الدقيقة (429). الانتظار التلقائي ${s} ثانية لاستئناف الدفعة...`);
+                    await new Promise(r => setTimeout(r, 1000));
                 }
+                return requestGeminiBatchTTS(keysArray, retryAttempt + 1);
             }
-            return null;
+            throw new Error('تجاوزت الحد المجاني المؤقت (429 Too Many Requests). انتظر 30 ثانية ثم جرب مجدداً.');
         }
 
-        // تشغيل مقطع صوتي من DataURL عبر HTML5 Audio
-        function playDataUrlAudio(srcUrl, onEnd) {
-            return new Promise((resolve) => {
-                try {
-                    if (currentAudioElement) {
-                        currentAudioElement.pause();
-                        currentAudioElement = null;
-                    }
-                    const audio = new Audio(srcUrl);
-                    currentAudioElement = audio;
-                    audio.playbackRate = 1.0;
-                    let settled = false;
-                    const finish = (success) => {
-                        if (settled) return;
-                        settled = true;
-                        if (success && onEnd) onEnd();
-                        resolve(success);
-                    };
-                    audio.onended = () => finish(true);
-                    audio.onerror = () => finish(false);
-                    const playPromise = audio.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(() => finish(false));
-                    }
-                } catch (e) {
-                    resolve(false);
-                }
-            });
-        }
-
-        function playPhoneticFallbackTone(isSingleSyllable, onEnd) {
+        if (response.status === 403 || response.status === 400) {
+            let errDetail = '';
             try {
-                initAudio();
-                const now = audioCtx.currentTime;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(isSingleSyllable ? 440 : 520, now);
-                osc.frequency.exponentialRampToValueAtTime(isSingleSyllable ? 580 : 660, now + 0.18);
-                gain.gain.setValueAtTime(0.18, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.22);
+                const errJson = await response.json();
+                errDetail = errJson?.error?.message || '';
             } catch (e) {}
-            if (onEnd) setTimeout(onEnd, 240);
+            throw new Error(`رفض الخادم المفتاح (${response.status}): تأكد أن المفتاح من Google AI Studio ويبدأ بـ AIza... ${errDetail}`);
         }
 
-        // الدالة الرئيسية الموحدة لنطق الكلمات والحروف (تعتمد حصرياً على الكاش الموحد أو Gemini TTS دون خلط أصوات أخرى)
-        async function forceSpeak(rawText, callback, isSingleSyllable = false) {
-            if (!rawText) {
-                if (callback) callback();
-                return;
-            }
-
-            if (currentAudioElement) {
-                currentAudioElement.pause();
-                currentAudioElement = null;
-            }
-
-            const cacheKey = getCacheKey(rawText, isSingleSyllable);
-
-            // 1. التشغيل الفوري من الحزمة الصوتية الموحدة (IndexedDB / audio_pack.json)
-            if (memoryAudioCache.has(cacheKey)) {
-                showToast(`🔊 صوت Gemini الموحد (أوفلاين)`);
-                const played = await playDataUrlAudio(memoryAudioCache.get(cacheKey), callback);
-                if (played) return;
-            }
-
-            // 2. إذا لم يكن مخزناً بعد، جلبه مباشرة من Google Gemini Natural TTS وحفظه للأبد
-            showToast(`⏳ جاري توليد صوت Gemini (${geminiVoiceName})...`);
-            const dataUrl = await fetchGeminiNaturalTTSBase64(rawText, isSingleSyllable, 2);
-            if (dataUrl) {
-                await saveAudioToCache(cacheKey, dataUrl);
-                showToast(`🔊 صوت Gemini (${geminiVoiceName}) - تم الحفظ`);
-                const played = await playDataUrlAudio(dataUrl, callback);
-                if (played) return;
-            }
-
-            // تنبيه لطيف في حال عدم وجود الحزمة أو مفتاح Gemini API
-            showToast(`⚠️ لم يتم العثور على الصوت في الحزمة؛ افتح "استوديو صوت Gemini" لتوليد الحزمة أو استيراد audio_pack.json`);
-            playPhoneticFallbackTone(isSingleSyllable, callback);
+        if (!response.ok) {
+            throw new Error(`خطأ من خادم Gemini: ${response.status}`);
         }
 
-        // التحميل المسبق الذكي بالخلفية للمرحلة الحالية بصوت Gemini الموحد فقط
-        async function warmUpLevelAudio(levelIndex) {
-            if (isPreloadingPack || levelIndex >= TOTAL_LEVELS) return;
-            if (!customGeminiKey && memoryAudioCache.size > 0) return;
-            const words = levels[levelIndex].words;
-            for (const w of words) {
-                const items = [
-                    { raw: w.l1, isSyl: true },
-                    { raw: w.l2, isSyl: true },
-                    { raw: w.l3, isSyl: true },
-                    { raw: w.full, isSyl: false },
-                    { raw: `أين هي كلمة ${w.full}`, isSyl: false }
-                ];
-                for (const item of items) {
-                    const key = getCacheKey(item.raw, item.isSyl);
-                    if (!memoryAudioCache.has(key)) {
-                        const dataUrl = await fetchGeminiNaturalTTSBase64(item.raw, item.isSyl, 2);
-                        if (dataUrl) await saveAudioToCache(key, dataUrl);
-                    }
+        const data = await response.json();
+        const inlineData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+        if (!inlineData || !inlineData.data) {
+            throw new Error('لم يرجع النموذج بيانات صوتية.');
+        }
+
+        const pcmSamples = base64ToInt16Samples(inlineData.data);
+        const slicedPcmArray = slicePcmBySilence(pcmSamples, keysArray.length, 24000);
+
+        for (let i = 0; i < keysArray.length; i++) {
+            const wavUrl = pcmInt16ToWavDataUrl(slicedPcmArray[i], 24000);
+            await saveAudioClipToDB(keysArray[i], wavUrl);
+        }
+
+        updateAudioPackUIStatus();
+        renderMenu(currentMenuPage);
+    }
+
+    async function generateSingleLevelBatch(levelIdx) {
+        const lv = levels[levelIdx];
+        if (!lv) return;
+        const neededKeys = [];
+        lv.words.forEach(w => {
+            [w.l1, w.l2, w.l3, w.full].forEach(item => {
+                const k = normalizeAudioKey(item);
+                if (!memoryAudioCache.has(k) && !neededKeys.includes(k)) {
+                    neededKeys.push(k);
                 }
-            }
+            });
+        });
+
+        const phrases = isFemaleStudent ? [...praiseListFemale, ...retryListFemale] : [...praiseListMale, ...retryListMale];
+        phrases.forEach(p => {
+            const k = normalizeAudioKey(p);
+            if (!memoryAudioCache.has(k) && !neededKeys.includes(k)) neededKeys.push(k);
+        });
+
+        if (neededKeys.length === 0) {
+            showToast('✅ أصوات هذه المرحلة محفوظة وجاهزة بالكامل أوفلاين!');
+            return true;
         }
 
-        // ============================================================================
-        // 4. نظام التوليد الشامل لحزمة Gemini وتصدير audio_pack.json / audio_pack.js / HTML المستقل
-        // ============================================================================
-        function collectAllGameAudioItems() {
-            const itemsMap = new Map();
-
-            // 1. جميع المقاطع الصوتية للحروف والكلمات الـ 88 والسؤال عنها
-            allWords.forEach(w => {
-                [w.l1, w.l2, w.l3].forEach(syl => {
-                    const key = getCacheKey(syl, true);
-                    if (!itemsMap.has(key)) itemsMap.set(key, { raw: syl, isSyl: true });
-                });
-                const wordKey = getCacheKey(w.full, false);
-                if (!itemsMap.has(wordKey)) itemsMap.set(wordKey, { raw: w.full, isSyl: false });
-
-                const qText = `أين هي كلمة ${w.full}`;
-                const qKey = getCacheKey(qText, false);
-                if (!itemsMap.has(qKey)) itemsMap.set(qKey, { raw: qText, isSyl: false });
-            });
-
-            // 2. العبارات التشجيعية للطلاب والطالبات
-            const allPhrases = [
-                ...encouragingWordsFemale, ...tryAgainWordsFemale,
-                ...encouragingWordsMale, ...tryAgainWordsMale
-            ];
-            allPhrases.forEach(p => {
-                const pKey = getCacheKey(p, false);
-                if (!itemsMap.has(pKey)) itemsMap.set(pKey, { raw: p, isSyl: false });
-            });
-
-            return Array.from(itemsMap.entries());
+        const apiKey = getCleanApiKey();
+        if (!apiKey) {
+            document.getElementById('gemini-modal').style.display = 'flex';
+            logToModalConsole('⚠️ يرجى إدخال مفتاح Google AI Studio API Key لتوليد صوت هذه المرحلة بطلب واحد.');
+            return false;
         }
 
-        async function preloadAllAudioToSmartboard() {
-            const btn = document.getElementById('preload-all-btn');
-            const wrap = document.getElementById('preload-progress-wrap');
-            const bar = document.getElementById('preload-progress-bar');
-            const status = document.getElementById('preload-status-text');
+        try {
+            showToast(`🎙️ جاري توليد أصوات المرحلة ${levelIdx + 1} بطلب Gemini واحد...`, 10000);
+            await requestGeminiBatchTTS(neededKeys);
+            showToast(`✅ تم توليد وحفظ أصوات المرحلة ${levelIdx + 1} بنجاح!`);
+            return true;
+        } catch (err) {
+            showToast(`⚠️ ${err.message}`, 5000);
+            logToModalConsole(`⚠️ ${err.message}`);
+            return false;
+        }
+    }
+	// ================== 5. تشغيل الصوت الموحد بدون خلط محركات ==================
+    let currentPlayingAudio = null;
 
-            if (isPreloadingPack) {
-                isPreloadingPack = false;
-                btn.innerText = '⚡ استئناف توليد حزمة Gemini';
-                status.innerText = '⏸️ تم إيقاف التوليد مؤقتاً. يمكنك الاستئناف في أي وقت.';
-                return;
-            }
+    function playCachedAudioSequence(keysArray, onEndCallback) {
+        if (currentPlayingAudio) {
+            currentPlayingAudio.pause();
+            currentPlayingAudio = null;
+        }
 
-            customGeminiKey = document.getElementById('gemini-api-key-input').value.trim();
-            geminiVoiceName = document.getElementById('gemini-voice-select').value;
-            phoneticMode = document.getElementById('phonetic-mode-select').value;
-            localStorage.setItem('smartboard_gemini_key', customGeminiKey);
-            localStorage.setItem('smartboard_gemini_voice', geminiVoiceName);
-            localStorage.setItem('smartboard_phonetic_mode', phoneticMode);
+        const validUrls = [];
+        const missingKeys = [];
 
-            const allItems = collectAllGameAudioItems();
-            const missingItems = allItems.filter(([key]) => !memoryAudioCache.has(key));
-
-            if (missingItems.length === 0) {
-                status.innerText = '✅ جميع أصوات Gemini الموحدة محفوظة وجاهزة بالكامل! يمكنك الآن تنزيل audio_pack.json.';
-                playCorrectSound();
-                return;
-            }
-
-            isPreloadingPack = true;
-            btn.innerText = '⏹️ إيقاف مؤقت';
-            wrap.style.display = 'block';
-            let completed = allItems.length - missingItems.length;
-            let succeeded = 0;
-
-            // توليد متتابع مضبوط (طلبان متوازيان مع فاصل قصير) لضمان أعلى جودة من Gemini TTS دون حظر Rate Limit
-            const batchSize = 2;
-            for (let i = 0; i < missingItems.length; i += batchSize) {
-                if (!isPreloadingPack) break;
-                const batch = missingItems.slice(i, i + batchSize);
-                await Promise.all(batch.map(async ([key, info]) => {
-                    const dataUrl = await fetchGeminiNaturalTTSBase64(info.raw, info.isSyl, 4);
-                    if (dataUrl) {
-                        await saveAudioToCache(key, dataUrl);
-                        succeeded++;
-                    }
-                    completed++;
-                }));
-                const pct = Math.round((completed / allItems.length) * 100);
-                bar.style.width = `${pct}%`;
-                status.innerText = `جاري توليد أصوات Gemini الموحدة (${geminiVoiceName})... (${memoryAudioCache.size} / ${allItems.length})`;
-                await new Promise(r => setTimeout(r, 350));
-            }
-
-            isPreloadingPack = false;
-            btn.innerText = '⚡ توليد حزمة Gemini كاملة';
-
-            if (memoryAudioCache.size >= allItems.length) {
-                status.innerText = `✅ اكتمل توليد جميع الأصوات (${memoryAudioCache.size} صوتاً) بصوت ${geminiVoiceName} الموحد! اضغط على "تنزيل audio_pack.json" لحفظها بجانب اللعبة.`;
-                playCorrectSound();
-            } else if (succeeded > 0) {
-                status.innerText = `✅ تم حفظ ${memoryAudioCache.size} من ${allItems.length} صوتاً حتى الآن. اضغط مرة أخرى لاستكمال الباقي في حال توقف الحد المؤقت للمفتاح.`;
+        keysArray.forEach(rawKey => {
+            const k = normalizeAudioKey(rawKey);
+            if (memoryAudioCache.has(k)) {
+                validUrls.push(memoryAudioCache.get(k));
             } else {
-                status.innerText = `⚠️ تعذر التوليد؛ تأكد من صحة مفتاح Google AI Studio (Gemini API Key) أو اتصالك بالإنترنت.`;
+                missingKeys.push(k);
             }
-        }
+        });
 
-        function exportAudioPackJSON() {
-            if (memoryAudioCache.size === 0) {
-                document.getElementById('preload-status-text').innerText = '⚠️ الذاكرة فارغة حالياً؛ قم بتوليد الأصوات أولاً قبل التصدير.';
-                return;
-            }
-            const obj = {};
-            memoryAudioCache.forEach((val, key) => { obj[key] = val; });
-            const jsonStr = JSON.stringify(obj);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'audio_pack.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            document.getElementById('preload-status-text').innerText = '✅ تم تنزيل audio_pack.json! ضعه في نفس المجلد بجانب index.html ليتم قراءته تلقائياً.';
-        }
-
-        function exportAudioPackJS() {
-            if (memoryAudioCache.size === 0) {
-                document.getElementById('preload-status-text').innerText = '⚠️ الذاكرة فارغة حالياً؛ قم بتوليد الأصوات أولاً قبل التصدير.';
-                return;
-            }
-            const obj = {};
-            memoryAudioCache.forEach((val, key) => { obj[key] = val; });
-            const jsContent = `window.PRELOADED_AUDIO_PACK = ${JSON.stringify(obj)};`;
-            const blob = new Blob([jsContent], { type: 'application/javascript' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'audio_pack.js';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            document.getElementById('preload-status-text').innerText = '✅ تم تنزيل audio_pack.js! ضعه بجانب index.html وسيعمل تلقائياً على أي لوح ذكي حتى بدون خادم (file://).';
-        }
-
-        function exportStandaloneHTMLWithAudio() {
-            if (memoryAudioCache.size === 0) {
-                document.getElementById('preload-status-text').innerText = '⚠️ يرجى توليد الأصوات أولاً قبل تصدير النسخة المدمجة.';
-                return;
-            }
-            const obj = {};
-            memoryAudioCache.forEach((val, key) => { obj[key] = val; });
-            const embeddedScript = `<script>window.PRELOADED_AUDIO_PACK = ${JSON.stringify(obj)};<\/script>`;
-            let fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-            // إخفاء النوافذ المفتوحة في النسخة المصدرة
-            fullHtml = fullHtml.replace('<head>', '<head>\n' + embeddedScript);
-            const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'index_offline_complete.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            document.getElementById('preload-status-text').innerText = '🚀 تم تنزيل ملف اللعبة الشامل (index_offline_complete.html) وبداخله جميع أصوات Gemini الموحدة!';
-        }
-
-        function importAudioPackJSON(file) {
-            if (!file) return;
-            const reader = new FileReader();
-            const status = document.getElementById('preload-status-text');
-            status.innerText = '⏳ جاري قراءة وحفظ الحقيبة الصوتية...';
-            reader.onload = async (e) => {
-                try {
-                    let raw = e.target.result.trim();
-                    if (raw.startsWith('window.PRELOADED_AUDIO_PACK')) {
-                        raw = raw.replace(/^window\.PRELOADED_AUDIO_PACK\s*=\s*/, '').replace(/;\s*$/, '');
-                    }
-                    const data = JSON.parse(raw);
-                    const keys = Object.keys(data);
-                    for (const k of keys) {
-                        await saveAudioToCache(k, data[k]);
-                    }
-                    status.innerText = `✅ تم استيراد وحفظ ${keys.length} مقطعاً صوتياً موحداً في اللوح الذكي بنجاح!`;
-                    playCorrectSound();
-                } catch (err) {
-                    status.innerText = '❌ الملف غير صالح، يرجى اختيار ملف audio_pack.json أو audio_pack.js صحيح.';
+        if (validUrls.length > 0 && missingKeys.length === 0) {
+            let idx = 0;
+            function playNextUrl() {
+                if (idx >= validUrls.length) {
+                    currentPlayingAudio = null;
+                    if (onEndCallback) onEndCallback();
+                    return;
                 }
+                const audio = new Audio(validUrls[idx]);
+                currentPlayingAudio = audio;
+                idx++;
+                audio.onended = playNextUrl;
+                audio.onerror = playNextUrl;
+                audio.play().catch(() => playNextUrl());
+            }
+            playNextUrl();
+            return;
+        }
+
+        // إذا كان الصوت غير موجود في الكاش، ولدينا مفتاح API، نقوم بتوليد المرحلة الحالية بطلب واحد فقط ثم نشغل الصوت
+        const apiKey = getCleanApiKey();
+        if (apiKey) {
+            generateSingleLevelBatch(currentLevelIdx).then((ok) => {
+                if (ok) {
+                    const k = normalizeAudioKey(keysArray[keysArray.length - 1]);
+                    if (memoryAudioCache.has(k)) {
+                        const audio = new Audio(memoryAudioCache.get(k));
+                        currentPlayingAudio = audio;
+                        audio.onended = () => { if (onEndCallback) onEndCallback(); };
+                        audio.play().catch(() => { if (onEndCallback) onEndCallback(); });
+                        return;
+                    }
+                }
+                if (onEndCallback) onEndCallback();
+            });
+        } else {
+            showToast('ℹ️ الصوت غير محفوظ بعد. اضغط (🎙️ صوت Gemini) بالأعلى لتوليد الحزمة أو استيرادها.');
+            if (onEndCallback) setTimeout(onEndCallback, 300);
+        }
+    }
+
+    function speakSingleItem(text, callback) {
+        playCachedAudioSequence([text], callback);
+    }
+
+    // ================== 6. المؤثرات الصوتية التفاعلية (Web Audio API أوفلاين 100%) ==================
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playTone(freq, duration, type = 'sine', volume = 0.25) {
+        try {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+    }
+
+    function playClickSound() { playTone(750, 0.05, 'sine', 0.18); }
+    function playNextSound() { playTone(580, 0.09, 'triangle', 0.2); }
+    function playCorrectSound() {
+        setTimeout(() => playTone(523, 0.14, 'sine', 0.22), 0);
+        setTimeout(() => playTone(659, 0.14, 'sine', 0.22), 130);
+        setTimeout(() => playTone(784, 0.22, 'sine', 0.26), 260);
+    }
+    function playWrongSound() {
+        setTimeout(() => playTone(360, 0.18, 'sawtooth', 0.14), 0);
+        setTimeout(() => playTone(280, 0.26, 'sawtooth', 0.14), 200);
+    }
+
+    // ================== 7. منطق ربط الحروف العربية الملونة بخط Arial ==================
+    const nonConnectingLetters = ['ا', 'أ', 'آ', 'إ', 'د', 'ذ', 'ر', 'ز', 'و', 'ؤ'];
+    function formatLetter(l, isMiddle) {
+        let formatted = l;
+        let found = nonConnectingLetters.some(ch => l.includes(ch));
+        if (!found) formatted = l + "ـ";
+        return formatted;
+    }
+
+    // ================== 8. إدارة شاشات اللعبة والمراحل ==================
+    let currentMenuPage = 0;
+    let currentLevelIdx = 0, currentWordIdx = 0, currentGameMode = 'menu';
+    let currentTestQuestionIdx = 0, firstTryCorrectCount = 0;
+    let currentQuestionMistakeMade = false;
+    let testPool = [], testOrder = [], currentTargetWord = null;
+    let selectedOptionWord = null;
+    let isConfirming = false;
+
+    const wordDisplay = document.getElementById('word-display');
+    const listenBtn = document.getElementById('listen-btn');
+    const nextBtn = document.getElementById('next-word-btn');
+    const testScreen = document.getElementById('test-screen');
+    const testOptions = document.getElementById('test-options');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const speakQBtn = document.getElementById('speak-q-btn');
+
+    function loadStars() {
+        for (let i = 0; i < TOTAL_LEVELS; i++) {
+            const saved = localStorage.getItem(`level_${i}_stars`);
+            if (saved !== null) levels[i].stars = parseInt(saved, 10);
+        }
+    }
+    loadStars();
+
+    const gameContainer = document.getElementById('game-container');
+    function resizeGame() {
+        const w = window.innerWidth, h = window.innerHeight, ratio = 1280 / 720;
+        let scale = (w / h > ratio) ? (h / 720) : (w / 1280);
+        gameContainer.style.transform = `scale(${scale * 0.98})`;
+    }
+    window.addEventListener('resize', resizeGame);
+    resizeGame();
+
+    function updateStarsBar() {
+        let totalStars = 0;
+        for (let i = 0; i < TOTAL_LEVELS; i++) totalStars += levels[i].stars;
+        document.getElementById('stars-count').innerText = `⭐ ${totalStars} / ${MAX_STARS}`;
+        document.getElementById('progress-fill').style.width = `${(totalStars / MAX_STARS) * 100}%`;
+    }
+
+    function renderMenu(page = 0) {
+        currentMenuPage = page;
+        document.getElementById('menu-screen').style.display = 'flex';
+        document.getElementById('game-screen').style.display = 'none';
+        testScreen.style.display = 'none';
+        document.getElementById('level-complete').style.display = 'none';
+        document.getElementById('top-bar').style.display = 'flex';
+        currentGameMode = 'menu';
+        updateStarsBar();
+
+        const itemsPerPage = 8, totalPages = Math.ceil(TOTAL_LEVELS / itemsPerPage);
+        const start = page * itemsPerPage, end = Math.min(start + itemsPerPage, TOTAL_LEVELS);
+        const grid = document.getElementById('level-grid');
+        grid.innerHTML = '';
+
+        for (let i = start; i < end; i++) {
+            const btn = document.createElement('div');
+            const cached = isLevelFullyCached(i);
+            btn.className = 'level-btn' + (cached ? ' cached-ready' : '');
+
+            const dot = document.createElement('div');
+            dot.className = 'cached-dot';
+            dot.title = 'صوت Gemini محفوظ أوفلاين لهذه المرحلة';
+            btn.appendChild(dot);
+
+            const numBadge = document.createElement('div');
+            numBadge.className = 'level-num-badge';
+            numBadge.innerText = `${i + 1}`;
+            btn.appendChild(numBadge);
+
+            const preview = document.createElement('div');
+            preview.className = 'level-words-preview';
+            preview.innerText = `${levels[i].words[0].full} • ${levels[i].words[1].full}`;
+            btn.appendChild(preview);
+
+            const starsDiv = document.createElement('div');
+            starsDiv.className = 'stars';
+            const starCount = levels[i].stars;
+            starsDiv.innerHTML = (starCount > 0 ? '⭐'.repeat(starCount) : '') + '<span class="empty">★</span>'.repeat(3 - starCount);
+            btn.appendChild(starsDiv);
+
+            btn.onclick = () => {
+                playClickSound();
+                startLevel(i);
             };
-            reader.readAsText(file);
+            grid.appendChild(btn);
         }
 
-        // ============================================================================
-        // 5. المؤثرات الصوتية التفاعلية (Web Audio API - تعمل أوفلاين 100%)
-        // ============================================================================
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+        document.getElementById('prev-page').style.display = (page > 0) ? 'flex' : 'none';
+        document.getElementById('next-page').style.display = (page < totalPages - 1) ? 'flex' : 'none';
+        document.getElementById('prev-page').onclick = () => { playClickSound(); renderMenu(page - 1); };
+        document.getElementById('next-page').onclick = () => { playClickSound(); renderMenu(page + 1); };
+    }
+
+    function startLevel(levelIdx) {
+        currentLevelIdx = levelIdx;
+        currentWordIdx = 0;
+        currentGameMode = 'spelling';
+        document.getElementById('top-bar').style.display = 'none';
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        testScreen.style.display = 'none';
+        document.getElementById('level-num').innerText = levelIdx + 1;
+        testOptions.innerHTML = '';
+        startSpelling();
+    }
+
+    function resetCircles() {
+        document.getElementById('circle2').classList.remove('visible');
+        document.getElementById('circle3').classList.remove('visible');
+        document.getElementById('circle1').classList.add('visible');
+        listenBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+    }
+
+    function startSpelling() {
+        const word = levels[currentLevelIdx].words[currentWordIdx];
+        document.getElementById('word-step-num').innerText = currentWordIdx + 1;
+        const letter1 = formatLetter(word.l1, true);
+        const letter2 = formatLetter(word.l2, true);
+        const letter3 = word.l3;
+
+        wordDisplay.innerHTML = `<c1 id="part1">${letter1}</c1><c2 id="part2">${letter2}</c2><c3 id="part3">${letter3}</c3>`;
+        resetCircles();
+    }
+
+    function handleCircleClick(letterIndex) {
+        if (currentGameMode !== 'spelling') return;
+        const word = levels[currentLevelIdx].words[currentWordIdx];
+        const letters = [word.l1, word.l2, word.l3];
+        const l = letters[letterIndex - 1];
+
+        const partEl = document.getElementById(`part${letterIndex}`);
+        if (partEl) {
+            partEl.classList.remove('active-letter-glow');
+            void partEl.offsetWidth;
+            partEl.classList.add('active-letter-glow');
         }
 
-        // فتح قفل الصوت على اللوح الذكي عند أول لمسة للشاشة
-        window.addEventListener('pointerdown', () => { initAudio(); }, { once: true });
+        speakSingleItem(l);
 
-        function playTone(freq, duration, type = 'sine', volume = 0.25) {
-            try {
-                initAudio();
-                const osc = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {}
+        if (letterIndex === 1) setTimeout(() => document.getElementById('circle2').classList.add('visible'), 350);
+        else if (letterIndex === 2) setTimeout(() => document.getElementById('circle3').classList.add('visible'), 350);
+        else if (letterIndex === 3) setTimeout(() => { listenBtn.style.display = 'flex'; }, 400);
+    }
+
+    document.getElementById('circle1').onclick = () => handleCircleClick(1);
+    document.getElementById('circle2').onclick = () => handleCircleClick(2);
+    document.getElementById('circle3').onclick = () => handleCircleClick(3);
+
+    listenBtn.onclick = () => {
+        const word = levels[currentLevelIdx].words[currentWordIdx];
+        speakSingleItem(word.full, () => {
+            nextBtn.style.display = 'block';
+        });
+    };
+
+    nextBtn.onclick = () => {
+        playNextSound();
+        currentWordIdx++;
+        if (currentWordIdx < WORDS_PER_LEVEL) startSpelling();
+        else startTesting();
+    };
+
+    document.getElementById('gen-this-level-btn').onclick = () => {
+        generateSingleLevelBatch(currentLevelIdx);
+    };
+
+    // ================== 9. طور الاختبار ==================
+    function startTesting() {
+        currentGameMode = 'testing';
+        document.getElementById('game-screen').style.display = 'none';
+        testScreen.style.display = 'flex';
+        document.getElementById('test-level-num').innerText = currentLevelIdx + 1;
+        confirmBtn.classList.remove('active');
+
+        testPool = [];
+        for (let i = 0; i <= currentLevelIdx; i++) levels[i].words.forEach(w => testPool.push(w));
+
+        const currentWords = levels[currentLevelIdx].words;
+        testOrder = shuffleArray([...currentWords]);
+        const shuffledReviews = shuffleArray(testPool.filter(w => !currentWords.includes(w)));
+        testOrder = testOrder.concat(shuffledReviews.slice(0, Math.min(2, shuffledReviews.length)));
+
+        currentTestQuestionIdx = 0;
+        firstTryCorrectCount = 0;
+        showTestQuestion();
+    }
+
+    function showTestQuestion() {
+        if (currentTestQuestionIdx >= testOrder.length) {
+            finishLevel();
+            return;
         }
 
-        function playClickSound() { playTone(750, 0.06, 'sine', 0.18); }
-        function playNextSound() { playTone(580, 0.1, 'triangle', 0.2); }
-        function playCorrectSound() {
-            setTimeout(() => playTone(523.25, 0.14, 'sine', 0.22), 0);
-            setTimeout(() => playTone(659.25, 0.14, 'sine', 0.22), 130);
-            setTimeout(() => playTone(783.99, 0.24, 'sine', 0.28), 260);
-        }
-        function playWrongSound() {
-            setTimeout(() => playTone(360, 0.18, 'sawtooth', 0.15), 0);
-            setTimeout(() => playTone(260, 0.28, 'sawtooth', 0.15), 200);
-        }
+        currentTargetWord = testOrder[currentTestQuestionIdx];
+        currentQuestionMistakeMade = false;
+        const wrongOptionsCount = (currentLevelIdx === 0) ? 1 : 3;
+        let wrongOptions = shuffleArray(testPool.filter(w => w.full !== currentTargetWord.full)).slice(0, wrongOptionsCount);
+        let allOptions = shuffleArray([currentTargetWord, ...wrongOptions]);
 
-        // ============================================================================
-        // 6. العبارات التشجيعية (مع دعم التبديل بين الطلاب والطالبات)
-        // ============================================================================
-        const encouragingWordsFemale = [
-            "أحسنتِ!", "ممتازة!", "رائعة!", "مذهلة!", "عبقرية!", "فخورة بكِ!", "إجابة صحيحة!", "أنتِ الأفضل!"
-        ];
-        const tryAgainWordsFemale = [
-            "حاولي مرة أخرى", "أثق بقدرتكِ", "لا بأس، جربي مجدداً", "استمري بالمحاولة", "ركزي قليلاً وستنجحين"
-        ];
+        testOptions.innerHTML = '';
+        selectedOptionWord = null;
+        confirmBtn.classList.remove('active');
+        isConfirming = false;
 
-        const encouragingWordsMale = [
-            "أحسنتَ!", "ممتاز!", "رائع!", "مذهل!", "عبقري!", "فخور بكَ!", "إجابة صحيحة!", "أنتَ الأفضل!"
-        ];
-        const tryAgainWordsMale = [
-            "حاول مرة أخرى", "أثق بقدرتكَ", "لا بأس، جرب مجدداً", "استمر بالمحاولة", "ركز قليلاً وستنجح"
-        ];
+        allOptions.forEach(wordObj => {
+            const btn = document.createElement('div');
+            btn.className = 'test-option-btn';
+            const l1f = formatLetter(wordObj.l1, true);
+            const l2f = formatLetter(wordObj.l2, true);
+            const l3 = wordObj.l3;
+            btn.innerHTML = `<word><c1>${l1f}</c1><c2>${l2f}</c2><c3>${l3}</c3></word>`;
 
-        function getEncouragingPhrase(isSuccess) {
-            const list = isSuccess
-                ? (isFemaleStudent ? encouragingWordsFemale : encouragingWordsMale)
-                : (isFemaleStudent ? tryAgainWordsFemale : tryAgainWordsMale);
-            return list[Math.floor(Math.random() * list.length)];
-        }
+            btn.onclick = () => {
+                if (isConfirming) return;
+                playClickSound();
+                document.querySelectorAll('.test-option-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedOptionWord = wordObj;
+                confirmBtn.classList.add('active');
+            };
+            testOptions.appendChild(btn);
+        });
 
-        function updateGenderUI() {
-            const btn = document.getElementById('gender-btn');
-            if (btn) {
-                btn.innerHTML = isFemaleStudent ? '👧 طالبات' : '👦 طلاب';
-            }
-        }
+        setTimeout(() => {
+            speakSingleItem(currentTargetWord.full);
+        }, 300);
+    }
 
-        // ============================================================================
-        // 7. إدارة الشاشات ومراحل اللعبة
-        // ============================================================================
-        const wordDisplay = document.getElementById('word-display');
-        const listenBtn = document.getElementById('listen-btn');
-        const nextBtn = document.getElementById('next-word-btn');
-        const testScreen = document.getElementById('test-screen');
-        const testOptions = document.getElementById('test-options');
-        const confirmBtn = document.getElementById('confirm-btn');
-        const speakQBtn = document.getElementById('speak-q-btn');
-        const feedbackBanner = document.getElementById('feedback-banner');
+    speakQBtn.onclick = () => {
+        if (currentTargetWord) speakSingleItem(currentTargetWord.full);
+    };
 
-        let currentMenuPage = 0;
-        let currentLevelIdx = 0;
-        let currentWordIdx = 0;
-        let currentGameMode = 'menu';
-        let currentTestQuestionIdx = 0;
-        let currentStars = 0;
-        let currentQuestionFirstAttempt = true; // إصلاح حساب النجوم بحيث تحتسب المحاولة الأولى الصحيحة
-        let testPool = [];
-        let testOrder = [];
-        let currentTargetWord = null;
-        let selectedOptionWord = null;
-        let isConfirming = false;
+    confirmBtn.onclick = () => {
+        if (!selectedOptionWord || isConfirming) return;
+        isConfirming = true;
+        const allBtns = document.querySelectorAll('.test-option-btn');
+        const selectedBtn = Array.from(allBtns).find(b => b.classList.contains('selected'));
 
-        // تحجيم متجاوب وتلقائي لشاشة اللوح الذكي
-        const gameContainer = document.getElementById('game-container');
-        function resizeGame() {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            const ratio = 1280 / 720;
-            const scale = (w / h > ratio) ? (h / 720) : (w / 1280);
-            gameContainer.style.transform = `scale(${scale * 0.98})`;
-        }
-        window.addEventListener('resize', resizeGame);
-        resizeGame();
+        if (selectedOptionWord.full === currentTargetWord.full) {
+            playCorrectSound();
+            selectedBtn.classList.remove('selected');
+            selectedBtn.classList.add('correct');
+            confirmBtn.classList.remove('active');
+            if (!currentQuestionMistakeMade) firstTryCorrectCount++;
 
-        function updateStarsBar() {
-            let totalStars = 0;
-            for (let i = 0; i < TOTAL_LEVELS; i++) totalStars += levels[i].stars;
-            document.getElementById('stars-count').innerText = `⭐ ${totalStars} / ${MAX_STARS}`;
-            document.getElementById('progress-fill').style.width = `${(totalStars / MAX_STARS) * 100}%`;
-        }
-
-        function renderMenu(page = currentMenuPage) {
-            currentMenuPage = page;
-            document.getElementById('menu-screen').style.display = 'flex';
-            document.getElementById('game-screen').style.display = 'none';
-            testScreen.style.display = 'none';
-            document.getElementById('level-complete').style.display = 'none';
-            currentGameMode = 'menu';
-            updateStarsBar();
-
-            const itemsPerPage = 8;
-            const totalPages = Math.ceil(TOTAL_LEVELS / itemsPerPage);
-            const start = page * itemsPerPage;
-            const end = Math.min(start + itemsPerPage, TOTAL_LEVELS);
-            const grid = document.getElementById('level-grid');
-            grid.innerHTML = '';
-
-            for (let i = start; i < end; i++) {
-                const btn = document.createElement('div');
-                const starCount = levels[i].stars;
-                btn.className = 'level-btn' + (starCount === 3 ? ' completed' : '');
-                btn.innerHTML = `<div>${i + 1}</div>`;
-
-                const starsDiv = document.createElement('div');
-                starsDiv.className = 'stars';
-                starsDiv.innerHTML = (starCount > 0 ? '⭐'.repeat(starCount) : '') + '<span class="empty">☆</span>'.repeat(3 - starCount);
-                btn.appendChild(starsDiv);
-
-                btn.onclick = () => {
-                    playClickSound();
-                    startLevel(i);
-                };
-                grid.appendChild(btn);
-            }
-
-            document.getElementById('page-indicator').innerText = `صفحة ${page + 1} من ${totalPages}`;
-            document.getElementById('prev-page').style.display = (page > 0) ? 'flex' : 'none';
-            document.getElementById('next-page').style.display = (page < totalPages - 1) ? 'flex' : 'none';
-            document.getElementById('prev-page').onclick = () => { playClickSound(); renderMenu(page - 1); };
-            document.getElementById('next-page').onclick = () => { playClickSound(); renderMenu(page + 1); };
-        }
-
-        function startLevel(levelIdx) {
-            currentLevelIdx = levelIdx;
-            currentWordIdx = 0;
-            currentGameMode = 'spelling';
-            currentStars = 0;
-
-            document.getElementById('menu-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'block';
-            testScreen.style.display = 'none';
-            document.getElementById('level-complete').style.display = 'none';
-
-            document.getElementById('level-num').innerText = levelIdx + 1;
-            startSpelling();
-            // تحضير أصوات المرحلة الحالية بالخلفية فوراً لحفظها أوفلاين
-            warmUpLevelAudio(levelIdx);
-        }
-
-        function resetCircles() {
-            document.getElementById('circle2').classList.remove('visible');
-            document.getElementById('circle3').classList.remove('visible');
-            document.getElementById('circle1').classList.add('visible');
-            listenBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
-        }
-
-        // ============================================================================
-        // 8. طور التهجئة التفاعلية (بدون مربعات سفلية وبدوائر ملونة صافية)
-        // ============================================================================
-        function startSpelling() {
-            const word = levels[currentLevelIdx].words[currentWordIdx];
-            document.getElementById('word-step-num').innerText = `${currentWordIdx + 1} / ${WORDS_PER_LEVEL}`;
-
-            wordDisplay.innerHTML = buildColoredWordHTML(word, 0);
-            resetCircles();
-        }
-
-        function handleCircleClick(letterIndex) {
-            if (currentGameMode !== 'spelling') return;
-            const word = levels[currentLevelIdx].words[currentWordIdx];
-            const letters = [word.l1, word.l2, word.l3];
-            const rawSyl = letters[letterIndex - 1];
-
-            // إبراز الحرف داخل الكلمة المتصلة بخط Arial
-            wordDisplay.innerHTML = buildColoredWordHTML(word, letterIndex);
-
-            // نطق الحرف بصوت واضح
-            forceSpeak(rawSyl, null, true);
+            const praises = isFemaleStudent ? praiseListFemale : praiseListMale;
+            const phrase = praises[Math.floor(Math.random() * praises.length)];
+            setTimeout(() => { speakSingleItem(phrase); }, 250);
 
             setTimeout(() => {
-                wordDisplay.innerHTML = buildColoredWordHTML(word, 0);
-            }, 550);
-
-            if (letterIndex === 1) {
-                setTimeout(() => document.getElementById('circle2').classList.add('visible'), 380);
-            } else if (letterIndex === 2) {
-                setTimeout(() => document.getElementById('circle3').classList.add('visible'), 380);
-            } else if (letterIndex === 3) {
-                setTimeout(() => { listenBtn.style.display = 'flex'; }, 480);
-            }
-        }
-
-        document.getElementById('circle1').onclick = () => handleCircleClick(1);
-        document.getElementById('circle2').onclick = () => handleCircleClick(2);
-        document.getElementById('circle3').onclick = () => handleCircleClick(3);
-
-        listenBtn.onclick = () => {
-            const word = levels[currentLevelIdx].words[currentWordIdx];
-            forceSpeak(word.full, () => {
-                setTimeout(() => { nextBtn.style.display = 'block'; }, 150);
-            }, false);
-        };
-
-        nextBtn.onclick = () => {
-            playNextSound();
-            currentWordIdx++;
-            if (currentWordIdx < WORDS_PER_LEVEL) {
-                startSpelling();
-            } else {
-                startTesting();
-            }
-        };
-
-        // ============================================================================
-        // 9. طور الاختبار ومراجعة الكلمات السابقة
-        // ============================================================================
-        function startTesting() {
-            currentGameMode = 'testing';
-            document.getElementById('game-screen').style.display = 'none';
-            testScreen.style.display = 'flex';
+                isConfirming = false;
+                currentTestQuestionIdx++;
+                showTestQuestion();
+            }, 1350);
+        } else {
+            playWrongSound();
+            currentQuestionMistakeMade = true;
+            selectedBtn.classList.remove('selected');
+            selectedBtn.classList.add('wrong');
             confirmBtn.classList.remove('active');
 
-            testPool = [];
-            for (let i = 0; i <= currentLevelIdx; i++) {
-                levels[i].words.forEach(w => testPool.push(w));
-            }
-
-            const currentWords = levels[currentLevelIdx].words;
-            testOrder = shuffleArray([...currentWords]);
-
-            // إضافة كلمات مراجعة من المراحل السابقة (حد أقصى 3 كلمات)
-            const previousWords = testPool.filter(w => !currentWords.some(cw => cw.full === w.full));
-            const uniquePrev = [];
-            const seen = new Set();
-            previousWords.forEach(w => {
-                if (!seen.has(w.full)) {
-                    seen.add(w.full);
-                    uniquePrev.push(w);
-                }
-            });
-            const shuffledReviews = shuffleArray(uniquePrev);
-            testOrder = testOrder.concat(shuffledReviews.slice(0, Math.min(3, shuffledReviews.length)));
-
-            currentTestQuestionIdx = 0;
-            currentStars = 0;
-            showTestQuestion();
-        }
-
-        function showTestQuestion() {
-            if (currentTestQuestionIdx >= testOrder.length) {
-                finishLevel();
-                return;
-            }
-
-            currentTargetWord = testOrder[currentTestQuestionIdx];
-            currentQuestionFirstAttempt = true;
-            document.getElementById('test-q-counter').innerText = `${currentTestQuestionIdx + 1} / ${testOrder.length}`;
-            feedbackBanner.innerText = '';
-
-            const wrongOptionsCount = (currentLevelIdx === 0) ? 1 : 3;
-            // ضمان عدم تكرار نفس الكلمة في الخيارات الخاطئة
-            const uniqueCandidates = [];
-            const usedFull = new Set([currentTargetWord.full]);
-            shuffleArray([...testPool, ...allWords]).forEach(w => {
-                if (!usedFull.has(w.full)) {
-                    usedFull.add(w.full);
-                    uniqueCandidates.push(w);
-                }
-            });
-
-            const wrongOptions = uniqueCandidates.slice(0, wrongOptionsCount);
-            const allOptions = shuffleArray([currentTargetWord, ...wrongOptions]);
-
-            testOptions.innerHTML = '';
-            selectedOptionWord = null;
-            confirmBtn.classList.remove('active');
-            isConfirming = false;
-
-            allOptions.forEach(wordObj => {
-                const btn = document.createElement('div');
-                btn.className = 'test-option-btn';
-                btn.innerHTML = `<word>${buildColoredWordHTML(wordObj, 0)}</word>`;
-
-                btn.onclick = () => {
-                    if (isConfirming) return;
-                    playClickSound();
-                    document.querySelectorAll('.test-option-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedOptionWord = wordObj;
-                    confirmBtn.classList.add('active');
-                };
-                testOptions.appendChild(btn);
-            });
+            const retries = isFemaleStudent ? retryListFemale : retryListMale;
+            const phrase = retries[0];
+            setTimeout(() => { speakSingleItem(phrase); }, 250);
 
             setTimeout(() => {
-                forceSpeak(`أين هي كلمة ${currentTargetWord.full}`, null, false);
-            }, 280);
+                selectedBtn.classList.remove('wrong');
+                selectedOptionWord = null;
+                isConfirming = false;
+            }, 1300);
+        }
+    };
+
+    function finishLevel() {
+        const ratio = firstTryCorrectCount / testOrder.length;
+        let earnedStars = 1;
+        if (ratio >= 0.85) earnedStars = 3;
+        else if (ratio >= 0.5) earnedStars = 2;
+
+        if (earnedStars > levels[currentLevelIdx].stars) {
+            levels[currentLevelIdx].stars = earnedStars;
+            localStorage.setItem(`level_${currentLevelIdx}_stars`, earnedStars);
         }
 
-        speakQBtn.onclick = () => {
-            if (!currentTargetWord) return;
-            forceSpeak(`أين هي كلمة ${currentTargetWord.full}`, null, false);
-        };
+        testScreen.style.display = 'none';
+        const completeDiv = document.getElementById('level-complete');
+        completeDiv.style.display = 'flex';
 
-        confirmBtn.onclick = () => {
-            if (!selectedOptionWord || isConfirming) return;
-            isConfirming = true;
-
-            const allBtns = document.querySelectorAll('.test-option-btn');
-            const selectedBtn = Array.from(allBtns).find(b => b.classList.contains('selected'));
-
-            if (selectedOptionWord.full === currentTargetWord.full) {
-                playCorrectSound();
-                selectedBtn.classList.remove('selected');
-                selectedBtn.classList.add('correct');
-                confirmBtn.classList.remove('active');
-
-                // تحتسب النجمة إذا أجاب بشكل صحيح من المحاولة الأولى لهذا السؤال
-                if (currentQuestionFirstAttempt) {
-                    currentStars++;
-                }
-
-                const phrase = getEncouragingPhrase(true);
-                feedbackBanner.style.color = '#4ade80';
-                feedbackBanner.innerText = `🌟 ${phrase}`;
-                setTimeout(() => { forceSpeak(phrase, null, false); }, 320);
-
-                setTimeout(() => {
-                    isConfirming = false;
-                    currentTestQuestionIdx++;
-                    showTestQuestion();
-                }, 1450);
-            } else {
-                playWrongSound();
-                currentQuestionFirstAttempt = false; // خصم نقطة المحاولة الأولى عند الخطأ
-                selectedBtn.classList.remove('selected');
-                selectedBtn.classList.add('wrong');
-                confirmBtn.classList.remove('active');
-
-                const phrase = getEncouragingPhrase(false);
-                feedbackBanner.style.color = '#fca5a5';
-                feedbackBanner.innerText = `💡 ${phrase}`;
-                setTimeout(() => { forceSpeak(phrase, null, false); }, 320);
-
-                setTimeout(() => {
-                    selectedBtn.classList.remove('wrong');
-                    selectedOptionWord = null;
-                    isConfirming = false;
-                }, 1400);
-            }
-        };
-
-        function finishLevel() {
-            const ratio = currentStars / testOrder.length;
-            let earnedStars = 1;
-            if (ratio >= 0.8) earnedStars = 3;
-            else if (ratio >= 0.5) earnedStars = 2;
-
-            if (earnedStars > levels[currentLevelIdx].stars) {
-                levels[currentLevelIdx].stars = earnedStars;
-                localStorage.setItem(`level_${currentLevelIdx}_stars`, earnedStars);
-            }
-
-            testScreen.style.display = 'none';
-            const completeDiv = document.getElementById('level-complete');
-            completeDiv.style.display = 'flex';
-
-            document.getElementById('complete-title').innerText = isFemaleStudent
-                ? 'أحسنتِ! انتهت المرحلة'
-                : 'أحسنتَ! انتهت المرحلة';
-
-            let starsHTML = '';
-            for (let i = 0; i < 3; i++) {
-                starsHTML += (i < earnedStars) ? '⭐' : '☆';
-            }
-            document.getElementById('complete-stars').innerHTML = starsHTML;
-
-            const verb = isFemaleStudent ? 'حصلتِ' : 'حصلتَ';
-            document.getElementById('complete-msg').innerText = `لقد ${verb} على ${earnedStars} نجوم في المرحلة ${currentLevelIdx + 1}`;
-
-            const nextLevelBtn = document.getElementById('next-level-btn');
-            if (currentLevelIdx + 1 < TOTAL_LEVELS) {
-                nextLevelBtn.style.display = 'inline-flex';
-                nextLevelBtn.onclick = () => {
-                    playClickSound();
-                    startLevel(currentLevelIdx + 1);
-                };
-            } else {
-                nextLevelBtn.style.display = 'none';
-            }
+        let starsHTML = '';
+        for (let i = 0; i < 3; i++) {
+            starsHTML += (i < earnedStars) ? '⭐' : '☆';
         }
+        document.getElementById('complete-stars').innerHTML = starsHTML;
+        const verb = isFemaleStudent ? 'حصلتِ' : 'حصلتَ';
+        document.getElementById('complete-msg').innerText = `لقد ${verb} على ${earnedStars} نجوم في المرحلة ${currentLevelIdx + 1}`;
+    }
 
-        document.getElementById('complete-btn').onclick = () => {
-            playClickSound();
-            document.getElementById('level-complete').style.display = 'none';
-            renderMenu(Math.floor(currentLevelIdx / 8));
-        };
+    document.getElementById('complete-btn').onclick = () => {
+        document.getElementById('level-complete').style.display = 'none';
+        renderMenu(currentMenuPage);
+    };
 
-        // ============================================================================
-        // 10. ربط الأزرار والنوافذ التفاعلية
-        // ============================================================================
-        document.getElementById('back-btn').onclick = () => { playClickSound(); renderMenu(); };
-        document.getElementById('test-back-btn').onclick = () => { playClickSound(); renderMenu(); };
+    document.getElementById('back-btn').onclick = () => renderMenu(currentMenuPage);
+    document.getElementById('test-back-btn').onclick = () => renderMenu(currentMenuPage);
 
-        // زر تبديل الخلفية بين الخلفية المريحة لذوي صعوبات التعلم والصورة الخارجية
-        function updateBgModeUI() {
-            const bgBtn = document.getElementById('bg-toggle-btn');
-            if (useCustomBgImage) {
-                gameContainer.classList.add('custom-image-bg');
-                if (bgBtn) bgBtn.innerHTML = '🖼️ صورة خارجية';
-            } else {
-                gameContainer.classList.remove('custom-image-bg');
-                if (bgBtn) bgBtn.innerHTML = '🎨 خلفية مريحة';
-            }
+    function shuffleArray(arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
         }
+        return copy;
+    }
 
-        document.getElementById('bg-toggle-btn').onclick = () => {
-            playClickSound();
-            useCustomBgImage = !useCustomBgImage;
-            localStorage.setItem('smartboard_bg_mode', useCustomBgImage ? 'custom' : 'ld_calm');
-            updateBgModeUI();
-        };
+    // ================== 10. أزرار التحكم العلوية واستوديو Gemini ==================
+    const genderBtn = document.getElementById('gender-toggle-btn');
+    function updateGenderBtnUI() {
+        genderBtn.innerText = isFemaleStudent ? '👧 طالبات' : '👦 طلاب';
+    }
+    updateGenderBtnUI();
 
-        document.getElementById('fullscreen-btn').onclick = () => {
-            playClickSound();
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            } else if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
-        };
+    genderBtn.onclick = () => {
+        isFemaleStudent = !isFemaleStudent;
+        localStorage.setItem('spelling_student_gender', isFemaleStudent ? 'female' : 'male');
+        updateGenderBtnUI();
+    };
 
-        // تبديل الطلاب / الطالبات
-        document.getElementById('gender-btn').onclick = () => {
-            playClickSound();
-            isFemaleStudent = !isFemaleStudent;
-            localStorage.setItem('smartboard_gender', isFemaleStudent ? 'female' : 'male');
-            updateGenderUI();
-            forceSpeak(getEncouragingPhrase(true), null, false);
-        };
+    document.getElementById('fullscreen-btn').onclick = () => {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+        else if (document.exitFullscreen) document.exitFullscreen();
+    };
 
-        // نافذة إعادة تعيين النجوم المخصصة
-        document.getElementById('reset-btn').onclick = () => {
-            playClickSound();
-            document.getElementById('reset-modal').style.display = 'flex';
-        };
-        document.getElementById('confirm-reset-no').onclick = () => {
-            playClickSound();
-            document.getElementById('reset-modal').style.display = 'none';
-        };
-        document.getElementById('confirm-reset-yes').onclick = () => {
-            playClickSound();
+    document.getElementById('reset-btn').onclick = () => {
+        if (confirm('هل أنت متأكد من رغبتك في تصفير النجوم؟ (لن يتم حذف الأصوات المحفوظة)')) {
             for (let i = 0; i < TOTAL_LEVELS; i++) {
                 levels[i].stars = 0;
                 localStorage.removeItem(`level_${i}_stars`);
             }
-            document.getElementById('reset-modal').style.display = 'none';
-            renderMenu(0);
-        };
+            renderMenu(currentMenuPage);
+        }
+    };
 
-        // نافذة إعدادات الصوت والعمل بدون إنترنت
-        const audioModal = document.getElementById('audio-modal');
-        const voiceSelect = document.getElementById('gemini-voice-select');
-        const phoneticSelect = document.getElementById('phonetic-mode-select');
-        const geminiKeyInput = document.getElementById('gemini-api-key-input');
+    const geminiModal = document.getElementById('gemini-modal');
+    document.getElementById('open-gemini-modal-btn').onclick = () => {
+        geminiModal.style.display = 'flex';
+    };
+    document.getElementById('close-gemini-modal').onclick = () => {
+        geminiModal.style.display = 'none';
+    };
 
-        voiceSelect.value = geminiVoiceName;
-        phoneticSelect.value = phoneticMode;
-        geminiKeyInput.value = customGeminiKey;
+    const savedKey = localStorage.getItem('gemini_tts_api_key') || '';
+    if (savedKey) document.getElementById('gemini-api-key-input').value = savedKey;
+    const savedVoice = localStorage.getItem('gemini_tts_voice') || 'Kore';
+    document.getElementById('gemini-voice-select').value = savedVoice;
 
-        document.getElementById('audio-settings-btn').onclick = () => {
-            playClickSound();
-            updateCacheCountUI();
-            audioModal.style.display = 'flex';
-        };
+    document.getElementById('btn-gen-current-page').onclick = async () => {
+        stopBatchRequested = false;
+        const startLv = currentMenuPage * 8;
+        const endLv = Math.min(startLv + 8, TOTAL_LEVELS);
+        const needed = [];
 
-        document.getElementById('close-audio-modal').onclick = () => {
-            playClickSound();
-            geminiVoiceName = voiceSelect.value;
-            phoneticMode = phoneticSelect.value;
-            customGeminiKey = geminiKeyInput.value.trim();
-            localStorage.setItem('smartboard_gemini_voice', geminiVoiceName);
-            localStorage.setItem('smartboard_phonetic_mode', phoneticMode);
-            localStorage.setItem('smartboard_gemini_key', customGeminiKey);
-            audioModal.style.display = 'none';
-        };
+        for (let i = startLv; i < endLv; i++) {
+            levels[i].words.forEach(w => {
+                [w.l1, w.l2, w.l3, w.full].forEach(item => {
+                    const k = normalizeAudioKey(item);
+                    if (!memoryAudioCache.has(k) && !needed.includes(k)) needed.push(k);
+                });
+            });
+        }
+        [...praiseListFemale, ...retryListFemale, ...praiseListMale, ...retryListMale].forEach(p => {
+            const k = normalizeAudioKey(p);
+            if (!memoryAudioCache.has(k) && !needed.includes(k)) needed.push(k);
+        });
 
-        voiceSelect.onchange = () => {
-            geminiVoiceName = voiceSelect.value;
-            localStorage.setItem('smartboard_gemini_voice', geminiVoiceName);
-        };
+        await runSmartChunkedGeneration(needed, `صفحة المراحل (${startLv + 1} إلى ${endLv})`);
+    };
 
-        phoneticSelect.onchange = () => {
-            phoneticMode = phoneticSelect.value;
-            localStorage.setItem('smartboard_phonetic_mode', phoneticMode);
-            updateCacheCountUI();
-        };
+    document.getElementById('btn-gen-all-smart').onclick = async () => {
+        stopBatchRequested = false;
+        const allKeys = getAllUniqueGameAudioKeys();
+        const needed = allKeys.filter(k => !memoryAudioCache.has(k));
+        await runSmartChunkedGeneration(needed, 'جميع مراحل اللعبة (44 مرحلة)');
+    };
 
-        document.getElementById('clear-old-audio-btn').onclick = async () => {
-            playClickSound();
-            await clearAllAudioCache();
-            document.getElementById('preload-progress-bar').style.width = '0%';
-            document.getElementById('preload-status-text').innerText = '🗑️ تم مسح جميع الأصوات القديمة غير الموحدة من ذاكرة المتصفح! يمكنك الآن توليد حزمة Gemini النقية.';
-        };
+    document.getElementById('btn-stop-gen').onclick = () => {
+        stopBatchRequested = true;
+        logToModalConsole('⏹️ تم طلب إيقاف التوليد. جميع الدفعات التي اكتملت تم حفظها بنجاح.');
+    };
 
-        document.getElementById('test-voice-btn').onclick = () => {
-            customGeminiKey = geminiKeyInput.value.trim();
-            geminiVoiceName = voiceSelect.value;
-            phoneticMode = phoneticSelect.value;
-            localStorage.setItem('smartboard_gemini_key', customGeminiKey);
-            localStorage.setItem('smartboard_gemini_voice', geminiVoiceName);
-            localStorage.setItem('smartboard_phonetic_mode', phoneticMode);
-
-            forceSpeak('كَ', () => {
-                setTimeout(() => forceSpeak('تَ', () => {
-                    setTimeout(() => forceSpeak('بَ', () => {
-                        setTimeout(() => forceSpeak('كَتَبَ', null, false), 250);
-                    }, true), 250);
-                }, true), 250);
-            }, true);
-        };
-
-        document.getElementById('preload-all-btn').onclick = () => {
-            preloadAllAudioToSmartboard();
-        };
-
-        document.getElementById('export-pack-btn').onclick = () => {
-            exportAudioPackJSON();
-        };
-
-        document.getElementById('export-js-pack-btn').onclick = () => {
-            exportAudioPackJS();
-        };
-
-        document.getElementById('export-standalone-html-btn').onclick = () => {
-            exportStandaloneHTMLWithAudio();
-        };
-
-        document.getElementById('import-pack-btn').onclick = () => {
-            document.getElementById('import-pack-input').click();
-        };
-
-        document.getElementById('import-pack-input').onchange = (e) => {
-            if (e.target.files && e.target.files[0]) {
-                importAudioPackJSON(e.target.files[0]);
-            }
-        };
-
-        function shuffleArray(arr) {
-            const copy = [...arr];
-            for (let i = copy.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [copy[i], copy[j]] = [copy[j], copy[i]];
-            }
-            return copy;
+    async function runSmartChunkedGeneration(neededKeys, label) {
+        if (neededKeys.length === 0) {
+            logToModalConsole(`✅ جميع أصوات ${label} محفوظة وجاهزة بالفعل بنسبة 100%!`);
+            document.getElementById('batch-progress-bar').style.width = '100%';
+            return;
         }
 
-        // تشغيل أولي: فتح قاعدة البيانات ثم قراءة audio_pack.json أو audio_pack.js الموجود بجانب index.html تلقائياً
-        updateBgModeUI();
-        updateGenderUI();
+        const CHUNK_SIZE = 15;
+        const chunks = [];
+        for (let i = 0; i < neededKeys.length; i += CHUNK_SIZE) {
+            chunks.push(neededKeys.slice(i, i + CHUNK_SIZE));
+        }
+
+        logToModalConsole(`🚀 بدء توليد ${neededKeys.length} صوتاً لـ (${label}) مقسمة إلى ${chunks.length} دفعات فقط لتفادي خطأ 429...`);
+
+        for (let c = 0; c < chunks.length; c++) {
+            if (stopBatchRequested) break;
+            const pct = Math.round((c / chunks.length) * 100);
+            document.getElementById('batch-progress-bar').style.width = `${pct}%`;
+            logToModalConsole(`🎙️ جاري توليد الدفعة (${c + 1} من ${chunks.length}): [${chunks[c].join(' ، ')}]...`);
+
+            try {
+                await requestGeminiBatchTTS(chunks[c]);
+            } catch (err) {
+                logToModalConsole(`❌ توقف عند الدفعة ${c + 1}: ${err.message}`);
+                return;
+            }
+
+            const donePct = Math.round(((c + 1) / chunks.length) * 100);
+            document.getElementById('batch-progress-bar').style.width = `${donePct}%`;
+
+            if (c < chunks.length - 1 && !stopBatchRequested) {
+                const pauseSec = ((c + 1) % 2 === 0) ? 21 : 4;
+                for (let s = pauseSec; s > 0; s--) {
+                    if (stopBatchRequested) break;
+                    logToModalConsole(`✅ تم حفظ الدفعة ${c + 1}/${chunks.length}. تهدئة ${s} ثانية لاحترام حصة Google المجانية (منع خطأ 429)...`);
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+        }
+
+        if (!stopBatchRequested) {
+            logToModalConsole(`🎉 اكتمل توليد وحفظ ${label} بنجاح! يمكنك الآن تنزيل ملف audio_pack.json أو تصدير اللعبة الشاملة.`);
+            showToast('🎉 اكتمل توليد وحفظ الأصوات بنجاح!');
+        }
+    }
+
+    // ================== 11. تصدير واستيراد audio_pack.json أو HTML الشامل ==================
+    document.getElementById('btn-export-json').onclick = () => {
+        if (memoryAudioCache.size === 0) {
+            alert('لا توجد أصوات محفوظة لتصديرها بعد.');
+            return;
+        }
+        const obj = Object.fromEntries(memoryAudioCache);
+        const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'audio_pack.json';
+        a.click();
+        logToModalConsole(`💾 تم تنزيل audio_pack.json ويحتوي على (${memoryAudioCache.size}) مقطعاً صوتياً.`);
+    };
+
+    document.getElementById('btn-import-json').onclick = () => {
+        document.getElementById('import-json-file-input').click();
+    };
+
+    document.getElementById('import-json-file-input').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                let count = 0;
+                for (const [k, v] of Object.entries(data)) {
+                    await saveAudioClipToDB(k, v);
+                    count++;
+                }
+                updateAudioPackUIStatus();
+                renderMenu(currentMenuPage);
+                logToModalConsole(`✅ تم استيراد وحفظ (${count}) صوتاً من الملف بنجاح!`);
+                showToast(`✅ تم استيراد ${count} صوتاً بنجاح!`);
+            } catch (err) {
+                alert('ملف JSON غير صالح.');
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    document.getElementById('btn-export-single-html').onclick = () => {
+        if (memoryAudioCache.size === 0) {
+            alert('يرجى توليد الأصوات أو استيرادها أولاً قبل تصدير النسخة الشاملة.');
+            return;
+        }
+        const cloneDoc = document.documentElement.cloneNode(true);
+        const embedScript = cloneDoc.querySelector('#embedded-audio-pack');
+        embedScript.textContent = JSON.stringify(Object.fromEntries(memoryAudioCache));
+        const modalEl = cloneDoc.querySelector('#gemini-modal');
+        if (modalEl) modalEl.style.display = 'none';
+
+        const htmlContent = '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'spelling_game_smartboard_offline.html';
+        a.click();
+        logToModalConsole('📦 تم تصدير ملف (spelling_game_smartboard_offline.html) شامل جميع الأصوات بداخله!');
+    };
+
+    document.getElementById('btn-clear-db').onclick = async () => {
+        if (confirm('هل تريد مسح جميع الأصوات المحفوظة من المتصفح؟')) {
+            await clearAllAudioFromDB();
+            logToModalConsole('🗑️ تم مسح ذاكرة الأصوات بنجاح.');
+        }
+    };
+
+    async function checkEmbeddedOrOptionalJson(manualTrigger = false) {
+        try {
+            const rawEmbed = document.getElementById('embedded-audio-pack').textContent.trim();
+            if (rawEmbed && rawEmbed.length > 5) {
+                const parsed = JSON.parse(rawEmbed);
+                for (const [k, v] of Object.entries(parsed)) {
+                    await saveAudioClipToDB(k, v);
+                }
+            }
+        } catch (e) {}
+
+        if (manualTrigger) {
+            try {
+                const res = await fetch('./audio_pack.json', { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    let count = 0;
+                    for (const [k, v] of Object.entries(data)) {
+                        await saveAudioClipToDB(k, v);
+                        count++;
+                    }
+                    updateAudioPackUIStatus();
+                    renderMenu(currentMenuPage);
+                    logToModalConsole(`✅ تم قراءة ملف audio_pack.json المجاور بنجاح (${count} صوتاً)!`);
+                    showToast(`✅ تم تحميل audio_pack.json (${count} صوتاً)`);
+                } else {
+                    logToModalConsole('ℹ️ لم يتم العثور على ملف audio_pack.json في نفس المجلد. استخدم زر (استيراد ملف) لاختياره من جهازك.');
+                }
+            } catch (err) {
+                logToModalConsole('ℹ️ المتصفح يمنع قراءة الملفات المجاورة تلقائياً بدون خادم. استخدم زر (📂 استيراد ملف audio_pack.json) لاختيار الملف مباشرة.');
+            }
+        }
+    }
+
+    document.getElementById('btn-try-autoload-json').onclick = () => checkEmbeddedOrOptionalJson(true);
+
+    // تشغيل التهيئة عند فتح اللعبة
+    (async function initApp() {
+        await loadAllFromDBToMemory();
+        await checkEmbeddedOrOptionalJson(false);
         renderMenu(0);
-        initIndexedDB().then(async () => {
-            await autoLoadAdjacentAudioPack();
-            updateCacheCountUI();
-        });
-    </script>
+    })();
+</script>
 </body>
 </html>
