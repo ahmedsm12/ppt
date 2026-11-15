@@ -3,898 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة التهجئة التفاعلية - Gemini Natural TTS</title>
-    <!-- أيقونة مدمجة لمنع خطأ favicon.ico 404 في الكونسول -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+    <title>لعبة التهجئة التفاعلية</title>
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-        }
+        @font-face { font-family: 'MyCustomFont'; src: local('Arial'), local('Tahoma'); }
 
         body {
-            margin: 0;
-            padding: 0;
-            background: #1e293b;
-            overflow: hidden;
-            touch-action: manipulation;
-            font-family: 'Arial', 'Tahoma', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
+            margin: 0; padding: 0; background: #2b2b2b; overflow: hidden; touch-action: manipulation;
+            user-select: none; font-family: 'MyCustomFont', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw;
         }
 
-        /* حاوية اللعبة القياسية للوح الذكي 16:9 */
         #game-container {
-            width: 1280px;
-            height: 720px;
-            position: relative;
-            background: linear-gradient(180deg, #eBF4F6 0%, #dbeafe 55%, #dcfce7 100%);
-            overflow: hidden;
-            transform-origin: center center;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.45);
-            border-radius: 16px;
+            width: 1280px; height: 720px; position: relative;
+            background-color: #bfe3f7;
+            background-image: url('background.svg');
+            background-size: cover; background-position: center;
+            overflow: hidden; transform-origin: center center; box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* خلفية مريحة بصرياً لذوي صعوبات التعلم */
-        .ld-bg-decor {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* ================= الشريط العلوي ================= */
-        #top-bar {
-            position: absolute;
-            top: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: rgba(255, 255, 255, 0.92);
-            padding: 10px 22px;
-            border-radius: 22px;
-            border: 2px solid #cbd5e1;
-            width: 92%;
-            justify-content: space-between;
-            z-index: 15;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
-        }
-
-        #stars-count {
-            color: #1e293b;
-            font-size: 24px;
-            font-weight: bold;
-            min-width: 135px;
-            text-align: center;
-            background: #fef3c7;
-            padding: 6px 14px;
-            border-radius: 14px;
-            border: 2px solid #fde68a;
-        }
-
-        #progress-bg {
-            flex-grow: 1;
-            height: 16px;
-            background: #e2e8f0;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid #cbd5e1;
-        }
-
-        #progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #f59e0b, #10b981);
-            border-radius: 10px;
-            transition: width 0.4s ease;
-        }
-
-        #top-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .top-pill-btn {
-            background: #f8fafc;
-            border: 2px solid #cbd5e1;
-            border-radius: 14px;
-            padding: 8px 14px;
-            font-size: 17px;
-            font-weight: bold;
-            color: #1e293b;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Arial', sans-serif;
-            transition: all 0.15s;
-        }
-
-        .top-pill-btn:active { transform: scale(0.95); }
-
-        .top-pill-btn.gemini-ready {
-            background: #ecfdf5;
-            border-color: #10b981;
-            color: #065f46;
-        }
-
-        .top-pill-btn.gemini-missing {
-            background: #fffbeb;
-            border-color: #f59e0b;
-            color: #92400e;
-        }
-
-        .top-icon-btn {
-            background: #f8fafc;
-            border: 2px solid #cbd5e1;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-        }
-
-        .top-icon-btn:active { transform: scale(0.92); }
-
-        /* ================= شاشة القائمة ================= */
+        /* ================= القائمة (Glassmorphism) ================= */
         #menu-screen {
-            position: absolute;
-            inset: 0;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding-top: 60px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+            background: rgba(0, 0, 0, 0.25); display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
         }
 
-        #menu-header {
-            color: #1e293b;
-            font-size: 36px;
-            margin-bottom: 16px;
-            font-weight: bold;
-            background: rgba(255,255,255,0.85);
-            padding: 6px 32px;
-            border-radius: 20px;
-            border: 2px solid #cbd5e1;
-        }
+        #menu-header { color: #fff; font-size: 40px; margin-bottom: 15px; font-weight: bold; text-shadow: 0 4px 15px rgba(0,0,0,0.7); }
+        
+        #top-bar { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 20px; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); width: 75%; justify-content: space-between; }
+        #stars-count { color: #fff; font-size: 22px; font-weight: bold; min-width: 100px; text-align: center; }
+        #progress-bg { flex-grow: 1; height: 12px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; position: relative; }
+        #progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); border-radius: 10px; transition: width 0.5s ease; }
+        #top-controls { display: flex; gap: 10px; align-items: center; }
+        .top-btn { background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .top-btn:active { transform: scale(0.9); }
 
-        #level-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 22px;
-            padding: 28px 36px;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 28px;
-            border: 3px solid #cbd5e1;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-            max-width: 880px;
-        }
-
-        .level-btn {
-            width: 155px;
-            height: 125px;
-            background: #ffffff;
-            border-radius: 22px;
-            border: 3px solid #94a3b8;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-            box-shadow: 0 6px 0 #cbd5e1;
-            position: relative;
-        }
-
-        .level-btn:hover { border-color: #3b82f6; }
-        .level-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cbd5e1; }
-
-        .level-btn.cached-ready {
-            border-color: #10b981;
-            box-shadow: 0 6px 0 #a7f3d0;
-        }
-
-        .level-num-badge { font-size: 28px; font-weight: bold; color: #0f172a; }
-        .level-words-preview { font-size: 16px; color: #475569; margin-top: 2px; font-weight: bold; }
-        .level-btn .stars { font-size: 22px; margin-top: 4px; letter-spacing: 2px; }
-        .level-btn .stars .empty { color: #cbd5e1; }
-
-        .cached-dot {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #10b981;
-            display: none;
-        }
-
-        .level-btn.cached-ready .cached-dot { display: block; }
-
-        .nav-arrow {
-            position: absolute;
-            top: 54%;
-            transform: translateY(-50%);
-            background: #ffffff;
-            border: 3px solid #94a3b8;
-            color: #1e293b;
-            font-size: 44px;
-            width: 68px;
-            height: 96px;
-            border-radius: 20px;
-            cursor: pointer;
-            z-index: 11;
-            box-shadow: 0 6px 0 #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .nav-arrow:active { transform: translateY(-46%); box-shadow: 0 2px 0 #cbd5e1; }
-        #prev-page { right: 28px; }
-        #next-page { left: 28px; }
-
-        /* ================= شاشة التهجئة ================= */
-        #game-screen {
-            position: absolute;
-            inset: 0;
-            display: none;
-            z-index: 12;
-        }
-
-        .screen-top-nav {
-            position: absolute;
-            top: 22px;
-            left: 28px;
-            right: 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 20;
-        }
-
-        #back-btn, #test-back-btn {
-            padding: 12px 26px;
-            background: #ef4444;
-            color: #fff;
-            border: none;
-            border-radius: 16px;
-            font-size: 22px;
-            cursor: pointer;
-            font-weight: bold;
-            font-family: 'Arial', sans-serif;
-            box-shadow: 0 5px 0 #b91c1c;
-        }
-
-        #back-btn:active, #test-back-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #b91c1c; }
-
-        .level-badge-info {
+        /* زر التبديل بين وضع طالب ووضع طالبة */
+        .gender-toggle-btn {
             background: rgba(255, 255, 255, 0.95);
-            color: #1e293b;
-            font-size: 22px;
-            font-weight: bold;
-            padding: 10px 24px;
-            border-radius: 16px;
-            border: 2px solid #cbd5e1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .quick-gen-level-btn {
-            background: #eff6ff;
-            border: 2px solid #93c5fd;
-            color: #1d4ed8;
-            border-radius: 10px;
-            padding: 4px 12px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: 'Arial', sans-serif;
-        }
-
-        /* لوحة القراءة المخصصة لذوي صعوبات التعلم */
-        #word-container {
-            position: absolute;
-            top: 36%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fdfbf7;
-            border: 5px solid #cbd5e1;
-            border-radius: 36px;
-            padding: 25px 80px;
-            min-width: 560px;
-            min-height: 235px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.1);
-        }
-
-        word {
-            display: inline-block;
-            direction: rtl;
-            font-family: 'Arial', 'Tahoma', sans-serif !important;
-            font-size: 145px;
-            line-height: 1.35;
-            font-weight: bold;
-            letter-spacing: 0px;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        c1, c2, c3 {
-            display: inline;
-            font-family: 'Arial', 'Tahoma', sans-serif !important;
-            transition: filter 0.2s;
-        }
-
-        c1 { color: #dc2626 !important; }
-        c2 { color: #16a34a !important; }
-        c3 { color: #2563eb !important; }
-
-        @keyframes letterHighlight {
-            0% { filter: drop-shadow(0 0 0px rgba(0,0,0,0)); }
-            50% { filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.85)); }
-            100% { filter: drop-shadow(0 0 0px rgba(0,0,0,0)); }
-        }
-
-        .active-letter-glow {
-            animation: letterHighlight 0.55s ease;
-            text-decoration: underline;
-            text-underline-offset: 18px;
-        }
-
-        /* الدوائر الملونة بدون نص بداخلها */
-        #circles-container {
-            position: absolute;
-            bottom: 48px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 85px;
-            z-index: 15;
-        }
-
-        .circle {
-            width: 96px;
-            height: 96px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.15s, opacity 0.35s ease, box-shadow 0.15s;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .circle.visible { opacity: 1; pointer-events: all; }
-        .circle:active { transform: translateY(5px) scale(0.95); }
-
-        .circle-red {
-            background: radial-gradient(circle at 35% 30%, #f87171, #dc2626);
-            border: 5px solid #991b1b;
-            box-shadow: 0 8px 0 #7f1d1d, 0 12px 20px rgba(0,0,0,0.2);
-        }
-
-        .circle-green {
-            background: radial-gradient(circle at 35% 30%, #4ade80, #16a34a);
-            border: 5px solid #166534;
-            box-shadow: 0 8px 0 #14532d, 0 12px 20px rgba(0,0,0,0.2);
-        }
-
-        .circle-blue {
-            background: radial-gradient(circle at 35% 30%, #60a5fa, #2563eb);
-            border: 5px solid #1e40af;
-            box-shadow: 0 8px 0 #1e3a8a, 0 12px 20px rgba(0,0,0,0.2);
-        }
-
-        #controls-area {
-            position: absolute;
-            bottom: 168px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 30px;
-            align-items: center;
-            justify-content: center;
-            z-index: 15;
-        }
-
-        #listen-btn {
-            width: 86px;
-            height: 86px;
-            background: #ffffff;
-            border-radius: 50%;
-            border: 4px solid #0f172a;
-            cursor: pointer;
-            font-size: 40px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 7px 0 #0f172a;
-            transition: transform 0.15s;
-        }
-
-        #listen-btn:active { transform: translateY(4px); box-shadow: 0 3px 0 #0f172a; }
-
-        #next-word-btn {
-            position: absolute;
-            left: 36px;
-            bottom: 58px;
-            background: #10b981;
-            color: #ffffff;
-            border: none;
-            padding: 18px 34px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
             border-radius: 20px;
-            font-size: 26px;
-            cursor: pointer;
+            padding: 7px 18px;
+            font-size: 18px;
             font-weight: bold;
-            font-family: 'Arial', sans-serif;
-            display: none;
-            box-shadow: 0 6px 0 #047857;
-            z-index: 15;
+            color: #2c3e50;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            user-select: none;
+        }
+        .gender-toggle-btn:active {
+            transform: scale(0.92);
         }
 
-        #next-word-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #047857; }
+        #level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; padding: 30px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); max-width: 850px; margin-top: 50px; }
+
+        .level-btn { width: 120px; height: 120px; background: rgba(255, 255, 255, 0.85); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #222; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .level-btn:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .level-btn .stars { font-size: 26px; margin-top: 5px; letter-spacing: 3px; }
+        .level-btn .stars .empty { color: #ccc; }
+
+        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; font-size: 45px; padding: 10px 18px; border-radius: 15px; cursor: pointer; z-index: 11; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .nav-arrow:active { transform: translateY(-50%) scale(0.9); }
+        #prev-page { right: 20px; left: auto; }
+        #next-page { left: 20px; right: auto; }
+
+        /* ================= شاشة اللعبة ================= */
+        #game-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 5; background: transparent; }
+        #word-container { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
+        word { display: flex; justify-content: center; align-items: center; direction: rtl; font-family: 'MyCustomFont' !important; font-size: clamp(80px, 15vw + 1rem, 250px); font-weight: bold; color: black; text-shadow: 0 0 15px rgba(255,255,255,0.8); pointer-events: none; }
+
+        c1, c2, c3 { display: inline-flex; position: relative; font-family: 'MyCustomFont' !important; font-size: inherit; font-weight: inherit; color: inherit; pointer-events: none; }
+        c1 { color: #e74c3c !important; } c2 { color: #27ae60 !important; } c3 { color: #3498db !important; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        c1a, c2a, c3a { display: inline-flex; position: relative; font-size: inherit; font-weight: inherit; animation: pulse 0.5s ease forwards; transform-origin: center; pointer-events: none; }
+        c1a { color: #e74c3c !important; } c2a { color: #27ae60 !important; } c3a { color: #3498db !important; }
+
+        #circles-container { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; gap: 80px; }
+        .circle { width: 80px; height: 80px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s, opacity 0.5s ease; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; font-weight: bold; position: relative; opacity: 0; pointer-events: none; }
+        .circle:active { transform: scale(0.9); }
+        .circle.visible { opacity: 1; pointer-events: all; }
+        .circle-red { background: #e74c3c; border: 4px solid #c0392b; }
+        .circle-green { background: #27ae60; border: 4px solid #1e8449; }
+        .circle-blue { background: #3498db; border: 4px solid #2471a3; }
+
+        #controls-area { position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; align-items: center; justify-content: center; }
+        #listen-btn { width: 70px; height: 70px; background: rgba(255,255,255,0.9); border-radius: 50%; border: 3px solid #2c3e50; cursor: pointer; font-size: 30px; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; }
+        #listen-btn:active { transform: scale(0.95); }
+        #next-word-btn { position: absolute; left: 20px; bottom: 120px; background: rgba(255,255,255,0.95); border: none; padding: 15px 25px; border-radius: 15px; font-size: 22px; cursor: pointer; font-weight: bold; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; }
+        #next-word-btn:active { transform: scale(0.95); }
+
+        #level-progress { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 20px; background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 10px; }
+        #game-gender-btn { position: absolute; top: 20px; right: 125px; }
+        #back-btn { position: absolute; top: 20px; right: 20px; padding: 10px 25px; background: #e74c3c; color: #fff; border: none; border-radius: 12px; font-size: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: 0.2s; }
 
         /* ================= طور الاختبار ================= */
-        #test-screen {
-            position: absolute;
-            inset: 0;
-            display: none;
-            z-index: 14;
-            background: rgba(241, 245, 249, 0.85);
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding-top: 40px;
-        }
+        #test-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 6; background: rgba(0,0,0,0.35); flex-direction: column; align-items: center; justify-content: center; }
+        #test-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+        #test-speaker-icon { font-size: 60px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #speak-q-btn { width: 60px; height: 60px; background: rgba(255,255,255,0.9); border-radius: 50%; border: none; cursor: pointer; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #speak-q-btn:active { transform: scale(0.9); }
 
-        #test-header {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            margin-bottom: 24px;
-            background: #ffffff;
-            padding: 12px 32px;
-            border-radius: 24px;
-            border: 3px solid #cbd5e1;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
-        }
+        #test-options { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; width: 650px; }
+        .test-option-btn { background: rgba(255,255,255,0.9); padding: 25px; border-radius: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; display: flex; justify-content: center; align-items: center; border: 4px solid transparent; min-height: 100px; }
+        .test-option-btn:active { transform: scale(0.95); }
+        .test-option-btn word { font-size: 40px; }
+        
+        .test-option-btn.selected { border-color: #3498db; background: rgba(52, 152, 219, 0.2); transform: scale(1.02); }
+        .test-option-btn.correct { border-color: #2ecc71; background: rgba(46, 204, 113, 0.2); }
+        .test-option-btn.wrong { border-color: #e74c3c; background: rgba(231, 76, 60, 0.2); }
+        
+        #confirm-btn-area { margin-top: 40px; display: flex; align-items: center; justify-content: center; }
+        #confirm-btn { background: rgba(255,255,255,0.95); border: none; padding: 15px 50px; border-radius: 20px; font-size: 28px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); opacity: 0.4; pointer-events: none; transition: 0.2s; }
+        #confirm-btn.active { opacity: 1; pointer-events: all; background: #2ecc71; color: #fff; }
+        #confirm-btn.active:active { transform: scale(0.9); }
 
-        #test-prompt-label { font-size: 28px; font-weight: bold; color: #1e293b; }
-
-        #speak-q-btn {
-            width: 68px;
-            height: 68px;
-            background: #3b82f6;
-            color: #fff;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-size: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 0 #1d4ed8;
-        }
-
-        #speak-q-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #1d4ed8; }
-
-        #test-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            width: 760px;
-        }
-
-        .test-option-btn {
-            background: #fdfbf7;
-            padding: 18px;
-            border-radius: 26px;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 7px 0 #cbd5e1;
-            transition: transform 0.15s, border-color 0.15s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 4px solid #94a3b8;
-            min-height: 135px;
-        }
-
-        .test-option-btn word { font-size: 76px; line-height: 1.25; }
-
-        .test-option-btn.selected {
-            border-color: #2563eb;
-            background: #eff6ff;
-            box-shadow: 0 7px 0 #93c5fd;
-            transform: scale(1.02);
-        }
-
-        .test-option-btn.correct {
-            border-color: #16a34a;
-            background: #dcfce7;
-            box-shadow: 0 7px 0 #86efac;
-        }
-
-        .test-option-btn.wrong {
-            border-color: #dc2626;
-            background: #fee2e2;
-            box-shadow: 0 7px 0 #fca5a5;
-        }
-
-        #confirm-btn-area { margin-top: 28px; }
-
-        #confirm-btn {
-            background: #94a3b8;
-            color: #ffffff;
-            border: none;
-            padding: 16px 55px;
-            border-radius: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            font-family: 'Arial', sans-serif;
-            cursor: pointer;
-            opacity: 0.5;
-            pointer-events: none;
-            transition: 0.2s;
-        }
-
-        #confirm-btn.active {
-            opacity: 1;
-            pointer-events: all;
-            background: #16a34a;
-            box-shadow: 0 6px 0 #15803d;
-        }
-
-        /* ================= نافذة نهاية المرحلة ================= */
-        #level-complete {
-            position: absolute;
-            inset: 0;
-            display: none;
-            z-index: 30;
-            background: rgba(15, 23, 42, 0.7);
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #complete-box {
-            background: #ffffff;
-            padding: 45px;
-            border-radius: 36px;
-            text-align: center;
-            border: 4px solid #cbd5e1;
-            max-width: 520px;
-            width: 85%;
-        }
-
-        #complete-title { font-size: 38px; color: #0f172a; font-weight: bold; margin-bottom: 10px; }
-        #complete-stars { font-size: 62px; letter-spacing: 10px; margin: 18px 0; }
-        #complete-msg { font-size: 24px; color: #334155; margin-bottom: 28px; font-weight: bold; }
-
-        #complete-btn {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 16px 42px;
-            border-radius: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            font-family: 'Arial', sans-serif;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #1d4ed8;
-        }
-
-        /* ================= نافذة استوديو صوت Gemini ================= */
-        #gemini-modal {
-            position: absolute;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.78);
-            z-index: 50;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-card {
-            background: #ffffff;
-            width: 820px;
-            max-height: 670px;
-            border-radius: 28px;
-            padding: 26px 32px;
-            border: 3px solid #cbd5e1;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            overflow-y: auto;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 10px;
-        }
-
-        .modal-header h2 { margin: 0; font-size: 24px; color: #0f172a; }
-
-        .close-modal-btn {
-            background: #f1f5f9;
-            border: 2px solid #cbd5e1;
-            border-radius: 12px;
-            width: 40px;
-            height: 40px;
-            font-size: 22px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .quota-alert {
-            background: #eff6ff;
-            border: 2px solid #93c5fd;
-            color: #1e3a8a;
-            padding: 10px 14px;
-            border-radius: 14px;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-        .form-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .input-group label { font-size: 15px; font-weight: bold; color: #334155; }
-
-        .input-group input, .input-group select {
-            padding: 10px 14px;
-            border-radius: 12px;
-            border: 2px solid #cbd5e1;
-            font-size: 16px;
-            font-family: 'Arial', sans-serif;
-            direction: ltr;
-        }
-
-        .batch-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-        .action-btn {
-            padding: 12px 14px;
-            border-radius: 14px;
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-            font-family: 'Arial', sans-serif;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: transform 0.1s;
-        }
-
-        .action-btn:active { transform: scale(0.97); }
-        .btn-primary { background: #2563eb; color: #fff; }
-        .btn-emerald { background: #059669; color: #fff; }
-        .btn-amber { background: #d97706; color: #fff; }
-        .btn-purple { background: #7c3aed; color: #fff; }
-        .btn-danger { background: #dc2626; color: #fff; }
-        .btn-slate { background: #475569; color: #fff; }
-
-        .status-console {
-            background: #0f172a;
-            color: #38bdf8;
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-size: 15px;
-            min-height: 68px;
-            max-height: 110px;
-            overflow-y: auto;
-            line-height: 1.5;
-        }
-
-        .progress-bar-wrap {
-            width: 100%;
-            height: 14px;
-            background: #e2e8f0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        #batch-progress-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #10b981);
-            transition: width 0.3s;
-        }
-
-        #toast-banner {
-            position: absolute;
-            bottom: 18px;
-            right: 24px;
-            background: #0f172a;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 60;
-            display: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
+        /* ================= رسالة نهاية المرحلة ================= */
+        #level-complete { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 20; background: rgba(0, 0, 0, 0.7); flex-direction: column; align-items: center; justify-content: center; }
+        #complete-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 50px; border-radius: 40px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); max-width: 540px; width: 85%; }
+        #complete-title { font-size: 36px; color: #2c3e50; font-weight: bold; margin-bottom: 15px; }
+        #complete-stars { font-size: 50px; letter-spacing: 10px; margin: 20px 0; }
+        #complete-msg { font-size: 22px; color: #555; margin-bottom: 30px; line-height: 1.5; }
+        #complete-btn { background: #3498db; color: #fff; border: none; padding: 15px 40px; border-radius: 20px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #complete-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <!-- خلفية SVG هادئة ومريحة لذوي صعوبات التعلم -->
-    <svg class="ld-bg-decor" viewBox="0 0 1280 720" preserveAspectRatio="none">
-        <circle cx="1150" cy="110" r="65" fill="#fef08a" opacity="0.65"/>
-        <g fill="#ffffff" opacity="0.65">
-            <ellipse cx="240" cy="130" rx="95" ry="34"/>
-            <ellipse cx="290" cy="120" rx="70" ry="38"/>
-            <ellipse cx="880" cy="160" rx="110" ry="35"/>
-        </g>
-        <path d="M0,590 Q340,510 680,580 T1280,550 L1280,720 L0,720 Z" fill="#bbf7d0" opacity="0.65"/>
-        <path d="M0,635 Q450,575 920,635 T1280,615 L1280,720 L0,720 Z" fill="#86efac" opacity="0.55"/>
-    </svg>
-
-    <!-- الشريط العلوي -->
-    <div id="top-bar">
-        <div id="stars-count">⭐ 0 / 132</div>
-        <div id="progress-bg"><div id="progress-fill"></div></div>
-        <div id="top-controls">
-            <button class="top-pill-btn gemini-missing" id="open-gemini-modal-btn">
-                <span>🎙️</span>
-                <span id="audio-pack-status-text">تجهيز صوت Gemini (0%)</span>
-            </button>
-            <button class="top-pill-btn" id="gender-toggle-btn" title="تبديل صيغة التشجيع">👧 طالبات</button>
-            <button class="top-icon-btn" id="reset-btn" title="إعادة تعيين النجوم">🔄</button>
-            <button class="top-icon-btn" id="fullscreen-btn" title="ملء الشاشة">⛶</button>
-        </div>
-    </div>
-
-    <!-- شاشة القائمة -->
-    <div id="menu-screen">
-        <button id="prev-page" class="nav-arrow">‹</button>
-        <button id="next-page" class="nav-arrow">›</button>
-        <div id="menu-header">اختر المرحلة</div>
-        <div id="level-grid"></div>
-    </div>
-
-    <!-- شاشة التهجئة -->
-    <div id="game-screen">
-        <div class="screen-top-nav">
-            <button id="back-btn">✖ خروج للقائمة</button>
-            <div class="level-badge-info">
-                <span>المرحلة: <span id="level-num">1</span> (<span id="word-step-num">1</span>/2)</span>
-                <button class="quick-gen-level-btn" id="gen-this-level-btn">⚡ توليد صوت المرحلة (طلب 1)</button>
-            </div>
-        </div>
-
-        <div id="word-container">
-            <word id="word-display"></word>
-        </div>
-
-        <div id="circles-container">
-            <div id="circle1" class="circle circle-red visible"></div>
-            <div id="circle2" class="circle circle-green"></div>
-            <div id="circle3" class="circle circle-blue"></div>
-        </div>
-
-        <div id="controls-area">
-            <button id="listen-btn" title="استمع للكلمة كاملة">🔊</button>
-        </div>
-        <button id="next-word-btn">← التالي</button>
-    </div>
-
-    <!-- شاشة الاختبار -->
-    <div id="test-screen">
-        <div class="screen-top-nav">
-            <button id="test-back-btn">✖ خروج للقائمة</button>
-            <div class="level-badge-info">اختبار المرحلة: <span id="test-level-num">1</span></div>
-        </div>
-
-        <div id="test-header">
-            <span id="test-prompt-label">استمع ثم اختر الكلمة الصحيحة:</span>
-            <button id="speak-q-btn" title="إعادة سماع السؤال">🔊</button>
-        </div>
-        <div id="test-options"></div>
-        <div id="confirm-btn-area">
-            <button id="confirm-btn">تأكيد الإجابة ✔</button>
-        </div>
-    </div>
-
-    <!-- شاشة إنهاء المرحلة -->
-    <div id="level-complete">
-        <div id="complete-box">
-            <div id="complete-title">انتهت المرحلة!</div>
-            <div id="complete-stars"></div>
-            <div id="complete-msg">لقد أحرزت تقدماً رائعاً</div>
-            <button id="complete-btn">العودة للقائمة</button>
-        </div>
-    </div>
-
-    <!-- نافذة استوديو صوت Google Gemini Natural TTS -->
-    <div id="gemini-modal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2>🎙️ استوديو صوت Google Gemini Natural TTS (نظام الدفعات الذكي)</h2>
-                <button class="close-modal-btn" id="close-gemini-modal">✖</button>
-            </div>
-
-            <div class="quota-alert">
-                💡 <strong>لماذا ظهر خطأ 429 سابقاً؟</strong> لأن Google AI Studio يسمح بـ <strong>3 طلبات فقط في الدقيقة</strong> لمحرك الصوت.<br>
-                ✅ <strong>الحل الجديد هنا:</strong> يدمج النظام عدة كلمات وحروف في <strong>طلب صوتي واحد</strong> ثم يقطعها تلقائياً بدقة الموجة الصوتية!
-            </div>
-
-            <div class="form-row">
-                <div class="input-group">
-                    <label>🔑 مفتاح Google AI Studio API Key (يبدأ بـ AIza...):</label>
-                    <input type="password" id="gemini-api-key-input" placeholder="AIzaSy...">
-                </div>
-                <div class="input-group">
-                    <label>🗣️ الشخصية الصوتية الموحدة:</label>
-                    <select id="gemini-voice-select">
-                        <option value="Kore">Kore (صوت نسائي دافئ وواضح للمعلمة)</option>
-                        <option value="Zephyr">Zephyr (صوت نسائي هادئ ومشرق)</option>
-                        <option value="Puck">Puck (صوت رجالي حيوي وواضح)</option>
-                        <option value="Charon">Charon (صوت رجالي رزين وعميق)</option>
-                    </select>
+    <div id="game-container">
+        
+        <div id="menu-screen">
+            <div id="top-bar">
+                <div id="stars-count">⭐ 0 / 132</div>
+                <div id="progress-bg"><div id="progress-fill"></div></div>
+                <button id="gender-btn" class="gender-toggle-btn" title="تبديل وضع الطالب / الطالبة">👦 طالب</button>
+                <div id="top-controls">
+                    <button class="top-btn" id="reset-btn" title="إعادة تعيين النجوم">🔄</button>
+                    <button class="top-btn" id="fullscreen-btn" title="ملء الشاشة">⛶</button>
                 </div>
             </div>
 
-            <div class="progress-bar-wrap">
-                <div id="batch-progress-bar"></div>
+            <button id="prev-page" class="nav-arrow">‹</button>
+            <button id="next-page" class="nav-arrow">›</button>
+            <div id="menu-header">اختر المرحلة</div>
+            <div id="level-grid"></div>
+        </div>
+
+        <div id="game-screen">
+            <div id="level-progress">المرحلة: <span id="level-num">1</span></div>
+            <button id="game-gender-btn" class="gender-toggle-btn" title="تبديل وضع الطالب / الطالبة">👦 طالب</button>
+            <button id="back-btn">رجوع</button>
+
+            <div id="word-container"><word id="word-display"></word></div>
+
+            <div id="circles-container">
+                <div id="circle1" class="circle circle-red visible"></div>
+                <div id="circle2" class="circle circle-green"></div>
+                <div id="circle3" class="circle circle-blue"></div>
             </div>
 
-            <div class="status-console" id="gemini-console-log">
-                جاهز. أدخل مفتاح API أو قم باستيراد ملف حزمة صوتية (audio_pack.json) محفوظ مسبقاً.
+            <div id="controls-area">
+                <div id="listen-btn">🔊</div>
             </div>
+            <button id="next-word-btn">← التالي</button>
+        </div>
 
-            <div class="batch-actions-grid">
-                <button class="action-btn btn-emerald" id="btn-gen-current-page">⚡ توليد مراحل هذه الصفحة (8 مراحل)</button>
-                <button class="action-btn btn-primary" id="btn-gen-all-smart">🚀 توليد اللعبة كاملة (مع احترام حصة 429)</button>
-                <button class="action-btn btn-amber" id="btn-stop-gen">⏹️ إيقاف التوليد المؤقت</button>
+        <div id="test-screen">
+            <div id="test-header">
+                <div id="test-speaker-icon"></div>
+                <button id="speak-q-btn">🔊</button>
             </div>
+            <div id="test-options"></div>
+            <div id="confirm-btn-area">
+                <button id="confirm-btn">تأكيد الإجابة</button>
+            </div>
+        </div>
 
-            <div class="batch-actions-grid">
-                <button class="action-btn btn-purple" id="btn-export-json">💾 تنزيل audio_pack.json</button>
-                <button class="action-btn btn-slate" id="btn-import-json">📂 استيراد ملف audio_pack.json</button>
-                <button class="action-btn btn-emerald" id="btn-export-single-html">📦 تصدير لعبة HTML شاملة الأصوات</button>
+        <div id="level-complete">
+            <div id="complete-box">
+                <div id="complete-title">انتهت المرحلة!</div>
+                <div id="complete-stars"></div>
+                <div id="complete-msg">لقد أحرزت تقدماً رائعاً</div>
+                <button id="complete-btn">العودة للقائمة</button>
             </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                <button class="action-btn btn-slate" id="btn-try-autoload-json" style="font-size:14px; padding:8px 14px;">🔍 فحص وجود audio_pack.json بجانب الملف الآن</button>
-                <button class="action-btn btn-danger" id="btn-clear-db" style="font-size:14px; padding:8px 14px;">🗑️ مسح جميع الأصوات المخزنة</button>
-            </div>
-            <input type="file" id="import-json-file-input" accept=".json" style="display:none">
         </div>
     </div>
 
-    <div id="toast-banner"></div>
-</div>
-
-<!-- مكان مخصص لحقن الحزمة الصوتية المدمجة عند تصدير ملف HTML شامل -->
-<script id="embedded-audio-pack" type="application/json">{}</script>
-<script>
-    // ================== 1. بيانات الكلمات والمراحل ==================
-    const rawData = `كَتَبَ;كَ;تَ;بَ
+    <script>
+        // ================== البيانات ==================
+        const rawData = `كَتَبَ;كَ;تَ;بَ
 نَكَبَ;نَ;كَ;بَ
 نَبَتَ;نَ;بَ;تَ
 ثَبَتَ;ثَ;بَ;تَ
@@ -983,1089 +286,573 @@
 أَخَذَ;أَ;خَ;ذَ
 يَبَسَ;يَ;بَ;سَ`;
 
-    const allWords = rawData.split('\n').map(line => {
-        const parts = line.trim().split(';');
-        return { full: parts[0], l1: parts[1], l2: parts[2], l3: parts[3] };
-    });
-
-    const TOTAL_LEVELS = 44, WORDS_PER_LEVEL = 2, MAX_STARS = TOTAL_LEVELS * 3;
-    const levels = [];
-    for (let i = 0; i < TOTAL_LEVELS; i++) {
-        const startIdx = i * WORDS_PER_LEVEL;
-        levels.push({ words: allWords.slice(startIdx, startIdx + WORDS_PER_LEVEL), stars: 0 });
-    }
-
-    // تنظيف الحرف من التطويل (ـ) لتوحيد مفتاح الصوت في قاعدة البيانات
-    function normalizeAudioKey(text) {
-        if (!text) return '';
-        return text.replace(/ـ/g, '').trim();
-    }
-
-    function getPhoneticPromptText(cleanKey) {
-        if (cleanKey.length <= 2) {
-            return cleanKey;
-        }
-        return cleanKey;
-    }
-
-    // عبارات التشجيع المختصرة لتقليل حجم الحزمة وتوحيد الصوت
-    let isFemaleStudent = localStorage.getItem('spelling_student_gender') !== 'male';
-    const praiseListFemale = ["أَحْسَنْتِ", "مُمْتَازَة", "رَائِعَة"];
-    const retryListFemale  = ["حَاوِلِي مَرَّةً أُخْرَى"];
-    const praiseListMale   = ["أَحْسَنْتَ", "مُمْتَاز", "رَائِع"];
-    const retryListMale    = ["حَاوِلْ مَرَّةً أُخْرَى"];
-
-    function getAllUniqueGameAudioKeys() {
-        const set = new Set();
-        allWords.forEach(w => {
-            set.add(normalizeAudioKey(w.l1));
-            set.add(normalizeAudioKey(w.l2));
-            set.add(normalizeAudioKey(w.l3));
-            set.add(normalizeAudioKey(w.full));
+        const allWords = rawData.split('\n').map(line => {
+            const parts = line.split(';');
+            return { full: parts[0], l1: parts[1], l2: parts[2], l3: parts[3] };
         });
-        [...praiseListFemale, ...retryListFemale, ...praiseListMale, ...retryListMale].forEach(p => set.add(normalizeAudioKey(p)));
-        return Array.from(set);
-    }
 
-    // ================== 2. قاعدة البيانات المحلية IndexedDB + الذاكرة السريعة ==================
-    const DB_NAME = 'GeminiSpellingAudioDB_v3';
-    const STORE_NAME = 'audio_clips';
-    const memoryAudioCache = new Map();
-
-    function openAudioDB() {
-        return new Promise((resolve, reject) => {
-            const req = indexedDB.open(DB_NAME, 1);
-            req.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    db.createObjectStore(STORE_NAME);
-                }
-            };
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
-    }
-
-    async function loadAllFromDBToMemory() {
-        try {
-            const db = await openAudioDB();
-            return new Promise((resolve) => {
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                const store = tx.objectStore(STORE_NAME);
-                const req = store.openCursor();
-                req.onsuccess = (e) => {
-                    const cursor = e.target.result;
-                    if (cursor) {
-                        memoryAudioCache.set(cursor.key, cursor.value);
-                        cursor.continue();
-                    } else {
-                        updateAudioPackUIStatus();
-                        resolve();
-                    }
-                };
-                req.onerror = () => resolve();
-            });
-        } catch (err) {
-            console.warn('IndexedDB load warning:', err);
+        const TOTAL_LEVELS = 44, WORDS_PER_LEVEL = 2, MAX_STARS = TOTAL_LEVELS * 3;
+        const levels = [];
+        for (let i = 0; i < TOTAL_LEVELS; i++) {
+            const startIdx = i * WORDS_PER_LEVEL;
+            levels.push({ words: allWords.slice(startIdx, startIdx + WORDS_PER_LEVEL), stars: 0 });
         }
-    }
-
-    async function saveAudioClipToDB(key, wavDataUrl) {
-        const cleanKey = normalizeAudioKey(key);
-        memoryAudioCache.set(cleanKey, wavDataUrl);
-        try {
-            const db = await openAudioDB();
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            tx.objectStore(STORE_NAME).put(wavDataUrl, cleanKey);
-        } catch (e) {}
-    }
-
-    async function clearAllAudioFromDB() {
-        memoryAudioCache.clear();
-        try {
-            const db = await openAudioDB();
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            tx.objectStore(STORE_NAME).clear();
-        } catch (e) {}
-        updateAudioPackUIStatus();
-        renderMenu(currentMenuPage);
-    }
-
-    function isLevelFullyCached(levelIdx) {
-        const lv = levels[levelIdx];
-        if (!lv) return false;
-        for (const w of lv.words) {
-            if (!memoryAudioCache.has(normalizeAudioKey(w.l1))) return false;
-            if (!memoryAudioCache.has(normalizeAudioKey(w.l2))) return false;
-            if (!memoryAudioCache.has(normalizeAudioKey(w.l3))) return false;
-            if (!memoryAudioCache.has(normalizeAudioKey(w.full))) return false;
-        }
-        return true;
-    }
-
-    function updateAudioPackUIStatus() {
-        const allKeys = getAllUniqueGameAudioKeys();
-        let cachedCount = 0;
-        allKeys.forEach(k => { if (memoryAudioCache.has(k)) cachedCount++; });
-        const pct = Math.round((cachedCount / allKeys.length) * 100);
-        const btn = document.getElementById('open-gemini-modal-btn');
-        const txt = document.getElementById('audio-pack-status-text');
-        txt.innerText = `صوت Gemini (${pct}% جاهز أوفلاين)`;
-        if (pct >= 95) {
-            btn.classList.remove('gemini-missing');
-            btn.classList.add('gemini-ready');
-        } else {
-            btn.classList.remove('gemini-ready');
-            btn.classList.add('gemini-missing');
-        }
-    }
-
-    // ================== 3. معالج الصوت الرقمي (PCM to WAV + Smart Silence Slicer) ==================
-    function pcmInt16ToWavDataUrl(int16Samples, sampleRate = 24000) {
-        const buffer = new ArrayBuffer(44 + int16Samples.length * 2);
-        const view = new DataView(buffer);
-
-        function writeStr(offset, str) {
-            for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-        }
-
-        writeStr(0, 'RIFF');
-        view.setUint32(4, 36 + int16Samples.length * 2, true);
-        writeStr(8, 'WAVE');
-        writeStr(12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, 1, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * 2, true);
-        view.setUint16(32, 2, true);
-        view.setUint16(34, 16, true);
-        writeStr(36, 'data');
-        view.setUint32(40, int16Samples.length * 2, true);
-
-        let offset = 44;
-        for (let i = 0; i < int16Samples.length; i++, offset += 2) {
-            view.setInt16(offset, int16Samples[i], true);
-        }
-
-        const bytes = new Uint8Array(buffer);
-        let binary = '';
-        const chunkSize = 8192;
-        for (let i = 0; i < bytes.length; i += chunkSize) {
-            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
-        }
-        return 'data:audio/wav;base64,' + btoa(binary);
-    }
-
-    function base64ToInt16Samples(base64Pcm) {
-        const binary = atob(base64Pcm);
-        const len = binary.length - (binary.length % 2);
-        const samples = new Int16Array(len / 2);
-        for (let i = 0; i < len; i += 2) {
-            const lo = binary.charCodeAt(i);
-            const hi = binary.charCodeAt(i + 1);
-            let val = (hi << 8) | lo;
-            if (val >= 0x8000) val -= 0x10000;
-            samples[i / 2] = val;
-        }
-        return samples;
-    }
-
-    function slicePcmBySilence(samples, expectedCount, sampleRate = 24000) {
-        if (expectedCount === 1) return [samples];
-
-        const windowSize = Math.floor(sampleRate * 0.02);
-        const numWindows = Math.floor(samples.length / windowSize);
-        const rmsValues = new Float32Array(numWindows);
-        let maxRms = 1;
-
-        for (let w = 0; w < numWindows; w++) {
-            let sumSq = 0;
-            const start = w * windowSize;
-            for (let i = start; i < start + windowSize; i++) {
-                const s = samples[i];
-                sumSq += s * s;
+        function loadStars() {
+            for (let i = 0; i < TOTAL_LEVELS; i++) {
+                const saved = localStorage.getItem(`level_${i}_stars`);
+                if (saved !== null) levels[i].stars = parseInt(saved, 10);
             }
-            const rms = Math.sqrt(sumSq / windowSize);
-            rmsValues[w] = rms;
-            if (rms > maxRms) maxRms = rms;
+        }
+        loadStars();
+
+        // ================== وضع الطالب / الطالبة ==================
+        let currentGender = localStorage.getItem('student_gender') || 'boy'; // 'boy' or 'girl'
+
+        function setGender(gender) {
+            currentGender = gender;
+            localStorage.setItem('student_gender', currentGender);
+            updateGenderUI();
         }
 
-        const thresholds = [0.035, 0.05, 0.025, 0.07, 0.018, 0.09];
-        const mingapWindows = [8, 6, 10, 5, 12];
+        function toggleGender() {
+            playClickSound();
+            setGender(currentGender === 'boy' ? 'girl' : 'boy');
+        }
 
-        let bestSegments = null;
-        let bestDiff = 999;
-
-        for (const minGap of mingapWindows) {
-            for (const ratio of thresholds) {
-                const thresh = Math.max(180, maxRms * ratio);
-                const rawSegments = [];
-                let inSpeech = false;
-                let segStart = 0;
-                let silenceCounter = 0;
-
-                for (let w = 0; w < numWindows; w++) {
-                    if (rmsValues[w] > thresh) {
-                        if (!inSpeech) {
-                            inSpeech = true;
-                            segStart = Math.max(0, w - 2);
-                        }
-                        silenceCounter = 0;
-                    } else if (inSpeech) {
-                        silenceCounter++;
-                        if (silenceCounter >= minGap) {
-                            const segEnd = Math.min(numWindows, w - silenceCounter + 3);
-                            if (segEnd - segStart >= 4) {
-                                rawSegments.push([segStart * windowSize, segEnd * windowSize]);
-                            }
-                            inSpeech = false;
-                        }
-                    }
-                }
-                if (inSpeech) {
-                    rawSegments.push([segStart * windowSize, samples.length]);
-                }
-
-                const diff = Math.abs(rawSegments.length - expectedCount);
-                if (diff < bestDiff) {
-                    bestDiff = diff;
-                    bestSegments = rawSegments;
-                }
-                if (diff === 0) break;
+        function updateGenderUI() {
+            const isBoy = currentGender === 'boy';
+            const text = isBoy ? '👦 طالب' : '👧 طالبة';
+            const title = isBoy ? 'الوضع الحالي: طالب (انقر للتبديل إلى وضع طالبة)' : 'الوضع الحالي: طالبة (انقر للتبديل إلى وضع طالب)';
+            
+            const menuBtn = document.getElementById('gender-btn');
+            if (menuBtn) {
+                menuBtn.innerText = text;
+                menuBtn.title = title;
             }
-            if (bestDiff === 0) break;
-        }
-
-        if (bestSegments && bestSegments.length === expectedCount) {
-            return bestSegments.map(([s, e]) => samples.subarray(s, e));
-        }
-
-        if (bestSegments && bestSegments.length > expectedCount) {
-            let segs = bestSegments.map(pair => [...pair]);
-            while (segs.length > expectedCount) {
-                let minGapIdx = 0;
-                let minGapVal = Infinity;
-                for (let i = 0; i < segs.length - 1; i++) {
-                    const gap = segs[i + 1][0] - segs[i][1];
-                    if (gap < minGapVal) {
-                        minGapVal = gap;
-                        minGapIdx = i;
-                    }
-                }
-                segs[minGapIdx][1] = segs[minGapIdx + 1][1];
-                segs.splice(minGapIdx + 1, 1);
+            const gameBtn = document.getElementById('game-gender-btn');
+            if (gameBtn) {
+                gameBtn.innerText = text;
+                gameBtn.title = title;
             }
-            return segs.map(([s, e]) => samples.subarray(s, e));
         }
 
-        const fallback = [];
-        const chunkLen = Math.floor(samples.length / expectedCount);
-        for (let i = 0; i < expectedCount; i++) {
-            fallback.push(samples.subarray(i * chunkLen, (i + 1) * chunkLen));
+        document.getElementById('gender-btn').onclick = toggleGender;
+        document.getElementById('game-gender-btn').onclick = toggleGender;
+
+        const wordDisplay = document.getElementById('word-display');
+        const listenBtn = document.getElementById('listen-btn');
+        const nextBtn = document.getElementById('next-word-btn');
+        const testScreen = document.getElementById('test-screen');
+        const testOptions = document.getElementById('test-options');
+        const testQuestion = document.getElementById('test-speaker-icon');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const speakQBtn = document.getElementById('speak-q-btn');
+
+        // ================== منطق الحروف والربط ==================
+        const nonConnectingLetters = ['ا', 'أ', 'آ', 'إ', 'د', 'ذ', 'ر', 'ز', 'و', 'ؤ'];
+        function formatLetter(l, isMiddle) {
+            let formatted = l;
+            let found = nonConnectingLetters.some(ch => l.includes(ch));
+            if (!found) formatted = l + "ـ";
+            if (isMiddle) formatted += "​‌"; 
+            return formatted;
         }
-        return fallback;
-    }
 
-    // ================== 4. الاتصال بـ Gemini 2.5 Flash TTS بنظام الدفعات الذكي ==================
-    let stopBatchRequested = false;
+        // ================== نظام الصوت (الملفات الصوتية الحقيقية فقط - بدون TTS) ==================
+        let currentAudio = null;
 
-    function getCleanApiKey() {
-        const inputEl = document.getElementById('gemini-api-key-input');
-        const val = (inputEl ? inputEl.value : localStorage.getItem('gemini_tts_api_key')) || '';
-        return val.trim();
-    }
-
-    function logToModalConsole(msg) {
-        const box = document.getElementById('gemini-console-log');
-        if (box) box.innerText = msg;
-    }
-
-    function showToast(msg, duration = 3000) {
-        const t = document.getElementById('toast-banner');
-        t.innerText = msg;
-        t.style.display = 'block';
-        clearTimeout(t._timer);
-        t._timer = setTimeout(() => { t.style.display = 'none'; }, duration);
-    }
-
-    async function requestGeminiBatchTTS(keysArray, retryAttempt = 0) {
-        const apiKey = getCleanApiKey();
-        if (!apiKey) {
-            throw new Error('يرجى إدخال مفتاح Google AI Studio API Key أولاً.');
-        }
-        localStorage.setItem('gemini_tts_api_key', apiKey);
-
-        const voiceName = document.getElementById('gemini-voice-select').value || 'Kore';
-        localStorage.setItem('gemini_tts_voice', voiceName);
-
-        const promptItems = keysArray.map(k => getPhoneticPromptText(k));
-        const promptText = `انطق كل مفردة عربية من المفردات التالية بالتشكيل الفصيح الواضح وبنفس النبرة تماماً، واترك وقفة صمت واضحة (نصف ثانية) بين كل مفردة والتي تليها دون إضافة أي كلمة أخرى:\n\n${promptItems.join(' ... \n')}`;
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }],
-                generationConfig: {
-                    responseModalities: ["AUDIO"],
-                    speechConfig: {
-                        voiceConfig: {
-                            prebuiltVoiceConfig: { voiceName }
-                        }
-                    }
-                }
-            })
-        });
-
-        if (response.status === 429) {
-            if (retryAttempt < 3 && !stopBatchRequested) {
-                const waitSec = 22 * (retryAttempt + 1);
-                for (let s = waitSec; s > 0; s--) {
-                    if (stopBatchRequested) throw new Error('تم إيقاف التوليد.');
-                    logToModalConsole(`⏳ تم الوصول لحد الطلبات المؤقت في الدقيقة (429). الانتظار التلقائي ${s} ثانية لاستئناف الدفعة...`);
-                    await new Promise(r => setTimeout(r, 1000));
-                }
-                return requestGeminiBatchTTS(keysArray, retryAttempt + 1);
+        function stopCurrentAudio() {
+            if (currentAudio) {
+                try {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                } catch (e) {}
+                currentAudio = null;
             }
-            throw new Error('تجاوزت الحد المجاني المؤقت (429 Too Many Requests). انتظر 30 ثانية ثم جرب مجدداً.');
         }
 
-        if (response.status === 403 || response.status === 400) {
-            let errDetail = '';
-            try {
-                const errJson = await response.json();
-                errDetail = errJson?.error?.message || '';
-            } catch (e) {}
-            throw new Error(`رفض الخادم المفتاح (${response.status}): تأكد أن المفتاح من Google AI Studio ويبدأ بـ AIza... ${errDetail}`);
-        }
-
-        if (!response.ok) {
-            throw new Error(`خطأ من خادم Gemini: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const inlineData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-        if (!inlineData || !inlineData.data) {
-            throw new Error('لم يرجع النموذج بيانات صوتية.');
-        }
-
-        const pcmSamples = base64ToInt16Samples(inlineData.data);
-        const slicedPcmArray = slicePcmBySilence(pcmSamples, keysArray.length, 24000);
-
-        for (let i = 0; i < keysArray.length; i++) {
-            const wavUrl = pcmInt16ToWavDataUrl(slicedPcmArray[i], 24000);
-            await saveAudioClipToDB(keysArray[i], wavUrl);
-        }
-
-        updateAudioPackUIStatus();
-        renderMenu(currentMenuPage);
-    }
-
-    async function generateSingleLevelBatch(levelIdx) {
-        const lv = levels[levelIdx];
-        if (!lv) return;
-        const neededKeys = [];
-        lv.words.forEach(w => {
-            [w.l1, w.l2, w.l3, w.full].forEach(item => {
-                const k = normalizeAudioKey(item);
-                if (!memoryAudioCache.has(k) && !neededKeys.includes(k)) {
-                    neededKeys.push(k);
-                }
-            });
-        });
-
-        const phrases = isFemaleStudent ? [...praiseListFemale, ...retryListFemale] : [...praiseListMale, ...retryListMale];
-        phrases.forEach(p => {
-            const k = normalizeAudioKey(p);
-            if (!memoryAudioCache.has(k) && !neededKeys.includes(k)) neededKeys.push(k);
-        });
-
-        if (neededKeys.length === 0) {
-            showToast('✅ أصوات هذه المرحلة محفوظة وجاهزة بالكامل أوفلاين!');
-            return true;
-        }
-
-        const apiKey = getCleanApiKey();
-        if (!apiKey) {
-            document.getElementById('gemini-modal').style.display = 'flex';
-            logToModalConsole('⚠️ يرجى إدخال مفتاح Google AI Studio API Key لتوليد صوت هذه المرحلة بطلب واحد.');
-            return false;
-        }
-
-        try {
-            showToast(`🎙️ جاري توليد أصوات المرحلة ${levelIdx + 1} بطلب Gemini واحد...`, 10000);
-            await requestGeminiBatchTTS(neededKeys);
-            showToast(`✅ تم توليد وحفظ أصوات المرحلة ${levelIdx + 1} بنجاح!`);
-            return true;
-        } catch (err) {
-            showToast(`⚠️ ${err.message}`, 5000);
-            logToModalConsole(`⚠️ ${err.message}`);
-            return false;
-        }
-    }
-	// ================== 5. تشغيل الصوت الموحد بدون خلط محركات ==================
-    let currentPlayingAudio = null;
-
-    function playCachedAudioSequence(keysArray, onEndCallback) {
-        if (currentPlayingAudio) {
-            currentPlayingAudio.pause();
-            currentPlayingAudio = null;
-        }
-
-        const validUrls = [];
-        const missingKeys = [];
-
-        keysArray.forEach(rawKey => {
-            const k = normalizeAudioKey(rawKey);
-            if (memoryAudioCache.has(k)) {
-                validUrls.push(memoryAudioCache.get(k));
-            } else {
-                missingKeys.push(k);
-            }
-        });
-
-        if (validUrls.length > 0 && missingKeys.length === 0) {
+        function playAudio(paths, onEnd) {
+            stopCurrentAudio();
+            const list = Array.isArray(paths) ? paths : [paths];
             let idx = 0;
-            function playNextUrl() {
-                if (idx >= validUrls.length) {
-                    currentPlayingAudio = null;
-                    if (onEndCallback) onEndCallback();
+
+            function tryNext() {
+                if (idx >= list.length) {
+                    if (onEnd) onEnd();
                     return;
                 }
-                const audio = new Audio(validUrls[idx]);
-                currentPlayingAudio = audio;
-                idx++;
-                audio.onended = playNextUrl;
-                audio.onerror = playNextUrl;
-                audio.play().catch(() => playNextUrl());
-            }
-            playNextUrl();
-            return;
-        }
 
-        // إذا كان الصوت غير موجود في الكاش، ولدينا مفتاح API، نقوم بتوليد المرحلة الحالية بطلب واحد فقط ثم نشغل الصوت
-        const apiKey = getCleanApiKey();
-        if (apiKey) {
-            generateSingleLevelBatch(currentLevelIdx).then((ok) => {
-                if (ok) {
-                    const k = normalizeAudioKey(keysArray[keysArray.length - 1]);
-                    if (memoryAudioCache.has(k)) {
-                        const audio = new Audio(memoryAudioCache.get(k));
-                        currentPlayingAudio = audio;
-                        audio.onended = () => { if (onEndCallback) onEndCallback(); };
-                        audio.play().catch(() => { if (onEndCallback) onEndCallback(); });
-                        return;
+                const path = list[idx++];
+                const audio = new Audio();
+                let called = false;
+
+                const finish = () => {
+                    if (!called) {
+                        called = true;
+                        if (currentAudio === audio) currentAudio = null;
+                        if (onEnd) onEnd();
                     }
+                };
+
+                audio.onended = finish;
+                audio.onerror = () => tryNext();
+
+                currentAudio = audio;
+                audio.src = path;
+
+                const p = audio.play();
+                if (p !== undefined) {
+                    p.catch(() => tryNext());
                 }
-                if (onEndCallback) onEndCallback();
-            });
-        } else {
-            showToast('ℹ️ الصوت غير محفوظ بعد. اضغط (🎙️ صوت Gemini) بالأعلى لتوليد الحزمة أو استيرادها.');
-            if (onEndCallback) setTimeout(onEndCallback, 300);
-        }
-    }
-
-    function speakSingleItem(text, callback) {
-        playCachedAudioSequence([text], callback);
-    }
-
-    // ================== 6. المؤثرات الصوتية التفاعلية (Web Audio API أوفلاين 100%) ==================
-    let audioCtx = null;
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    function playTone(freq, duration, type = 'sine', volume = 0.25) {
-        try {
-            initAudio();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.value = freq;
-            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        } catch (e) {}
-    }
-
-    function playClickSound() { playTone(750, 0.05, 'sine', 0.18); }
-    function playNextSound() { playTone(580, 0.09, 'triangle', 0.2); }
-    function playCorrectSound() {
-        setTimeout(() => playTone(523, 0.14, 'sine', 0.22), 0);
-        setTimeout(() => playTone(659, 0.14, 'sine', 0.22), 130);
-        setTimeout(() => playTone(784, 0.22, 'sine', 0.26), 260);
-    }
-    function playWrongSound() {
-        setTimeout(() => playTone(360, 0.18, 'sawtooth', 0.14), 0);
-        setTimeout(() => playTone(280, 0.26, 'sawtooth', 0.14), 200);
-    }
-
-    // ================== 7. منطق ربط الحروف العربية الملونة بخط Arial ==================
-    const nonConnectingLetters = ['ا', 'أ', 'آ', 'إ', 'د', 'ذ', 'ر', 'ز', 'و', 'ؤ'];
-    function formatLetter(l, isMiddle) {
-        let formatted = l;
-        let found = nonConnectingLetters.some(ch => l.includes(ch));
-        if (!found) formatted = l + "ـ";
-        return formatted;
-    }
-
-    // ================== 8. إدارة شاشات اللعبة والمراحل ==================
-    let currentMenuPage = 0;
-    let currentLevelIdx = 0, currentWordIdx = 0, currentGameMode = 'menu';
-    let currentTestQuestionIdx = 0, firstTryCorrectCount = 0;
-    let currentQuestionMistakeMade = false;
-    let testPool = [], testOrder = [], currentTargetWord = null;
-    let selectedOptionWord = null;
-    let isConfirming = false;
-
-    const wordDisplay = document.getElementById('word-display');
-    const listenBtn = document.getElementById('listen-btn');
-    const nextBtn = document.getElementById('next-word-btn');
-    const testScreen = document.getElementById('test-screen');
-    const testOptions = document.getElementById('test-options');
-    const confirmBtn = document.getElementById('confirm-btn');
-    const speakQBtn = document.getElementById('speak-q-btn');
-
-    function loadStars() {
-        for (let i = 0; i < TOTAL_LEVELS; i++) {
-            const saved = localStorage.getItem(`level_${i}_stars`);
-            if (saved !== null) levels[i].stars = parseInt(saved, 10);
-        }
-    }
-    loadStars();
-
-    const gameContainer = document.getElementById('game-container');
-    function resizeGame() {
-        const w = window.innerWidth, h = window.innerHeight, ratio = 1280 / 720;
-        let scale = (w / h > ratio) ? (h / 720) : (w / 1280);
-        gameContainer.style.transform = `scale(${scale * 0.98})`;
-    }
-    window.addEventListener('resize', resizeGame);
-    resizeGame();
-
-    function updateStarsBar() {
-        let totalStars = 0;
-        for (let i = 0; i < TOTAL_LEVELS; i++) totalStars += levels[i].stars;
-        document.getElementById('stars-count').innerText = `⭐ ${totalStars} / ${MAX_STARS}`;
-        document.getElementById('progress-fill').style.width = `${(totalStars / MAX_STARS) * 100}%`;
-    }
-
-    function renderMenu(page = 0) {
-        currentMenuPage = page;
-        document.getElementById('menu-screen').style.display = 'flex';
-        document.getElementById('game-screen').style.display = 'none';
-        testScreen.style.display = 'none';
-        document.getElementById('level-complete').style.display = 'none';
-        document.getElementById('top-bar').style.display = 'flex';
-        currentGameMode = 'menu';
-        updateStarsBar();
-
-        const itemsPerPage = 8, totalPages = Math.ceil(TOTAL_LEVELS / itemsPerPage);
-        const start = page * itemsPerPage, end = Math.min(start + itemsPerPage, TOTAL_LEVELS);
-        const grid = document.getElementById('level-grid');
-        grid.innerHTML = '';
-
-        for (let i = start; i < end; i++) {
-            const btn = document.createElement('div');
-            const cached = isLevelFullyCached(i);
-            btn.className = 'level-btn' + (cached ? ' cached-ready' : '');
-
-            const dot = document.createElement('div');
-            dot.className = 'cached-dot';
-            dot.title = 'صوت Gemini محفوظ أوفلاين لهذه المرحلة';
-            btn.appendChild(dot);
-
-            const numBadge = document.createElement('div');
-            numBadge.className = 'level-num-badge';
-            numBadge.innerText = `${i + 1}`;
-            btn.appendChild(numBadge);
-
-            const preview = document.createElement('div');
-            preview.className = 'level-words-preview';
-            preview.innerText = `${levels[i].words[0].full} • ${levels[i].words[1].full}`;
-            btn.appendChild(preview);
-
-            const starsDiv = document.createElement('div');
-            starsDiv.className = 'stars';
-            const starCount = levels[i].stars;
-            starsDiv.innerHTML = (starCount > 0 ? '⭐'.repeat(starCount) : '') + '<span class="empty">★</span>'.repeat(3 - starCount);
-            btn.appendChild(starsDiv);
-
-            btn.onclick = () => {
-                playClickSound();
-                startLevel(i);
-            };
-            grid.appendChild(btn);
-        }
-
-        document.getElementById('prev-page').style.display = (page > 0) ? 'flex' : 'none';
-        document.getElementById('next-page').style.display = (page < totalPages - 1) ? 'flex' : 'none';
-        document.getElementById('prev-page').onclick = () => { playClickSound(); renderMenu(page - 1); };
-        document.getElementById('next-page').onclick = () => { playClickSound(); renderMenu(page + 1); };
-    }
-
-    function startLevel(levelIdx) {
-        currentLevelIdx = levelIdx;
-        currentWordIdx = 0;
-        currentGameMode = 'spelling';
-        document.getElementById('top-bar').style.display = 'none';
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'block';
-        testScreen.style.display = 'none';
-        document.getElementById('level-num').innerText = levelIdx + 1;
-        testOptions.innerHTML = '';
-        startSpelling();
-    }
-
-    function resetCircles() {
-        document.getElementById('circle2').classList.remove('visible');
-        document.getElementById('circle3').classList.remove('visible');
-        document.getElementById('circle1').classList.add('visible');
-        listenBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-    }
-
-    function startSpelling() {
-        const word = levels[currentLevelIdx].words[currentWordIdx];
-        document.getElementById('word-step-num').innerText = currentWordIdx + 1;
-        const letter1 = formatLetter(word.l1, true);
-        const letter2 = formatLetter(word.l2, true);
-        const letter3 = word.l3;
-
-        wordDisplay.innerHTML = `<c1 id="part1">${letter1}</c1><c2 id="part2">${letter2}</c2><c3 id="part3">${letter3}</c3>`;
-        resetCircles();
-    }
-
-    function handleCircleClick(letterIndex) {
-        if (currentGameMode !== 'spelling') return;
-        const word = levels[currentLevelIdx].words[currentWordIdx];
-        const letters = [word.l1, word.l2, word.l3];
-        const l = letters[letterIndex - 1];
-
-        const partEl = document.getElementById(`part${letterIndex}`);
-        if (partEl) {
-            partEl.classList.remove('active-letter-glow');
-            void partEl.offsetWidth;
-            partEl.classList.add('active-letter-glow');
-        }
-
-        speakSingleItem(l);
-
-        if (letterIndex === 1) setTimeout(() => document.getElementById('circle2').classList.add('visible'), 350);
-        else if (letterIndex === 2) setTimeout(() => document.getElementById('circle3').classList.add('visible'), 350);
-        else if (letterIndex === 3) setTimeout(() => { listenBtn.style.display = 'flex'; }, 400);
-    }
-
-    document.getElementById('circle1').onclick = () => handleCircleClick(1);
-    document.getElementById('circle2').onclick = () => handleCircleClick(2);
-    document.getElementById('circle3').onclick = () => handleCircleClick(3);
-
-    listenBtn.onclick = () => {
-        const word = levels[currentLevelIdx].words[currentWordIdx];
-        speakSingleItem(word.full, () => {
-            nextBtn.style.display = 'block';
-        });
-    };
-
-    nextBtn.onclick = () => {
-        playNextSound();
-        currentWordIdx++;
-        if (currentWordIdx < WORDS_PER_LEVEL) startSpelling();
-        else startTesting();
-    };
-
-    document.getElementById('gen-this-level-btn').onclick = () => {
-        generateSingleLevelBatch(currentLevelIdx);
-    };
-
-    // ================== 9. طور الاختبار ==================
-    function startTesting() {
-        currentGameMode = 'testing';
-        document.getElementById('game-screen').style.display = 'none';
-        testScreen.style.display = 'flex';
-        document.getElementById('test-level-num').innerText = currentLevelIdx + 1;
-        confirmBtn.classList.remove('active');
-
-        testPool = [];
-        for (let i = 0; i <= currentLevelIdx; i++) levels[i].words.forEach(w => testPool.push(w));
-
-        const currentWords = levels[currentLevelIdx].words;
-        testOrder = shuffleArray([...currentWords]);
-        const shuffledReviews = shuffleArray(testPool.filter(w => !currentWords.includes(w)));
-        testOrder = testOrder.concat(shuffledReviews.slice(0, Math.min(2, shuffledReviews.length)));
-
-        currentTestQuestionIdx = 0;
-        firstTryCorrectCount = 0;
-        showTestQuestion();
-    }
-
-    function showTestQuestion() {
-        if (currentTestQuestionIdx >= testOrder.length) {
-            finishLevel();
-            return;
-        }
-
-        currentTargetWord = testOrder[currentTestQuestionIdx];
-        currentQuestionMistakeMade = false;
-        const wrongOptionsCount = (currentLevelIdx === 0) ? 1 : 3;
-        let wrongOptions = shuffleArray(testPool.filter(w => w.full !== currentTargetWord.full)).slice(0, wrongOptionsCount);
-        let allOptions = shuffleArray([currentTargetWord, ...wrongOptions]);
-
-        testOptions.innerHTML = '';
-        selectedOptionWord = null;
-        confirmBtn.classList.remove('active');
-        isConfirming = false;
-
-        allOptions.forEach(wordObj => {
-            const btn = document.createElement('div');
-            btn.className = 'test-option-btn';
-            const l1f = formatLetter(wordObj.l1, true);
-            const l2f = formatLetter(wordObj.l2, true);
-            const l3 = wordObj.l3;
-            btn.innerHTML = `<word><c1>${l1f}</c1><c2>${l2f}</c2><c3>${l3}</c3></word>`;
-
-            btn.onclick = () => {
-                if (isConfirming) return;
-                playClickSound();
-                document.querySelectorAll('.test-option-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                selectedOptionWord = wordObj;
-                confirmBtn.classList.add('active');
-            };
-            testOptions.appendChild(btn);
-        });
-
-        setTimeout(() => {
-            speakSingleItem(currentTargetWord.full);
-        }, 300);
-    }
-
-    speakQBtn.onclick = () => {
-        if (currentTargetWord) speakSingleItem(currentTargetWord.full);
-    };
-
-    confirmBtn.onclick = () => {
-        if (!selectedOptionWord || isConfirming) return;
-        isConfirming = true;
-        const allBtns = document.querySelectorAll('.test-option-btn');
-        const selectedBtn = Array.from(allBtns).find(b => b.classList.contains('selected'));
-
-        if (selectedOptionWord.full === currentTargetWord.full) {
-            playCorrectSound();
-            selectedBtn.classList.remove('selected');
-            selectedBtn.classList.add('correct');
-            confirmBtn.classList.remove('active');
-            if (!currentQuestionMistakeMade) firstTryCorrectCount++;
-
-            const praises = isFemaleStudent ? praiseListFemale : praiseListMale;
-            const phrase = praises[Math.floor(Math.random() * praises.length)];
-            setTimeout(() => { speakSingleItem(phrase); }, 250);
-
-            setTimeout(() => {
-                isConfirming = false;
-                currentTestQuestionIdx++;
-                showTestQuestion();
-            }, 1350);
-        } else {
-            playWrongSound();
-            currentQuestionMistakeMade = true;
-            selectedBtn.classList.remove('selected');
-            selectedBtn.classList.add('wrong');
-            confirmBtn.classList.remove('active');
-
-            const retries = isFemaleStudent ? retryListFemale : retryListMale;
-            const phrase = retries[0];
-            setTimeout(() => { speakSingleItem(phrase); }, 250);
-
-            setTimeout(() => {
-                selectedBtn.classList.remove('wrong');
-                selectedOptionWord = null;
-                isConfirming = false;
-            }, 1300);
-        }
-    };
-
-    function finishLevel() {
-        const ratio = firstTryCorrectCount / testOrder.length;
-        let earnedStars = 1;
-        if (ratio >= 0.85) earnedStars = 3;
-        else if (ratio >= 0.5) earnedStars = 2;
-
-        if (earnedStars > levels[currentLevelIdx].stars) {
-            levels[currentLevelIdx].stars = earnedStars;
-            localStorage.setItem(`level_${currentLevelIdx}_stars`, earnedStars);
-        }
-
-        testScreen.style.display = 'none';
-        const completeDiv = document.getElementById('level-complete');
-        completeDiv.style.display = 'flex';
-
-        let starsHTML = '';
-        for (let i = 0; i < 3; i++) {
-            starsHTML += (i < earnedStars) ? '⭐' : '☆';
-        }
-        document.getElementById('complete-stars').innerHTML = starsHTML;
-        const verb = isFemaleStudent ? 'حصلتِ' : 'حصلتَ';
-        document.getElementById('complete-msg').innerText = `لقد ${verb} على ${earnedStars} نجوم في المرحلة ${currentLevelIdx + 1}`;
-    }
-
-    document.getElementById('complete-btn').onclick = () => {
-        document.getElementById('level-complete').style.display = 'none';
-        renderMenu(currentMenuPage);
-    };
-
-    document.getElementById('back-btn').onclick = () => renderMenu(currentMenuPage);
-    document.getElementById('test-back-btn').onclick = () => renderMenu(currentMenuPage);
-
-    function shuffleArray(arr) {
-        const copy = [...arr];
-        for (let i = copy.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [copy[i], copy[j]] = [copy[j], copy[i]];
-        }
-        return copy;
-    }
-
-    // ================== 10. أزرار التحكم العلوية واستوديو Gemini ==================
-    const genderBtn = document.getElementById('gender-toggle-btn');
-    function updateGenderBtnUI() {
-        genderBtn.innerText = isFemaleStudent ? '👧 طالبات' : '👦 طلاب';
-    }
-    updateGenderBtnUI();
-
-    genderBtn.onclick = () => {
-        isFemaleStudent = !isFemaleStudent;
-        localStorage.setItem('spelling_student_gender', isFemaleStudent ? 'female' : 'male');
-        updateGenderBtnUI();
-    };
-
-    document.getElementById('fullscreen-btn').onclick = () => {
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
-        else if (document.exitFullscreen) document.exitFullscreen();
-    };
-
-    document.getElementById('reset-btn').onclick = () => {
-        if (confirm('هل أنت متأكد من رغبتك في تصفير النجوم؟ (لن يتم حذف الأصوات المحفوظة)')) {
-            for (let i = 0; i < TOTAL_LEVELS; i++) {
-                levels[i].stars = 0;
-                localStorage.removeItem(`level_${i}_stars`);
             }
-            renderMenu(currentMenuPage);
-        }
-    };
 
-    const geminiModal = document.getElementById('gemini-modal');
-    document.getElementById('open-gemini-modal-btn').onclick = () => {
-        geminiModal.style.display = 'flex';
-    };
-    document.getElementById('close-gemini-modal').onclick = () => {
-        geminiModal.style.display = 'none';
-    };
-
-    const savedKey = localStorage.getItem('gemini_tts_api_key') || '';
-    if (savedKey) document.getElementById('gemini-api-key-input').value = savedKey;
-    const savedVoice = localStorage.getItem('gemini_tts_voice') || 'Kore';
-    document.getElementById('gemini-voice-select').value = savedVoice;
-
-    document.getElementById('btn-gen-current-page').onclick = async () => {
-        stopBatchRequested = false;
-        const startLv = currentMenuPage * 8;
-        const endLv = Math.min(startLv + 8, TOTAL_LEVELS);
-        const needed = [];
-
-        for (let i = startLv; i < endLv; i++) {
-            levels[i].words.forEach(w => {
-                [w.l1, w.l2, w.l3, w.full].forEach(item => {
-                    const k = normalizeAudioKey(item);
-                    if (!memoryAudioCache.has(k) && !needed.includes(k)) needed.push(k);
-                });
-            });
-        }
-        [...praiseListFemale, ...retryListFemale, ...praiseListMale, ...retryListMale].forEach(p => {
-            const k = normalizeAudioKey(p);
-            if (!memoryAudioCache.has(k) && !needed.includes(k)) needed.push(k);
-        });
-
-        await runSmartChunkedGeneration(needed, `صفحة المراحل (${startLv + 1} إلى ${endLv})`);
-    };
-
-    document.getElementById('btn-gen-all-smart').onclick = async () => {
-        stopBatchRequested = false;
-        const allKeys = getAllUniqueGameAudioKeys();
-        const needed = allKeys.filter(k => !memoryAudioCache.has(k));
-        await runSmartChunkedGeneration(needed, 'جميع مراحل اللعبة (44 مرحلة)');
-    };
-
-    document.getElementById('btn-stop-gen').onclick = () => {
-        stopBatchRequested = true;
-        logToModalConsole('⏹️ تم طلب إيقاف التوليد. جميع الدفعات التي اكتملت تم حفظها بنجاح.');
-    };
-
-    async function runSmartChunkedGeneration(neededKeys, label) {
-        if (neededKeys.length === 0) {
-            logToModalConsole(`✅ جميع أصوات ${label} محفوظة وجاهزة بالفعل بنسبة 100%!`);
-            document.getElementById('batch-progress-bar').style.width = '100%';
-            return;
+            tryNext();
         }
 
-        const CHUNK_SIZE = 15;
-        const chunks = [];
-        for (let i = 0; i < neededKeys.length; i += CHUNK_SIZE) {
-            chunks.push(neededKeys.slice(i, i + CHUNK_SIZE));
+        function stripTashkeel(text) {
+            return text.replace(/[ًٌٍَُِّْ]/g, '');
         }
 
-        logToModalConsole(`🚀 بدء توليد ${neededKeys.length} صوتاً لـ (${label}) مقسمة إلى ${chunks.length} دفعات فقط لتفادي خطأ 429...`);
+        // 1. تشغيل صوت الحرف
+        function playLetterAudio(letter, callback) {
+            const clean = letter.replace(/ـ/g, '').trim();
+            const noFatha = clean.replace(/َ/g, '').trim();
+            const candidates = [
+                `audio/letters/${encodeURIComponent(clean)}.mp3`,
+                `audio/letters/${clean}.mp3`,
+                `audio/letters/${encodeURIComponent(noFatha)}.mp3`,
+                `audio/letters/${noFatha}.mp3`
+            ];
+            playAudio(candidates, callback);
+        }
 
-        for (let c = 0; c < chunks.length; c++) {
-            if (stopBatchRequested) break;
-            const pct = Math.round((c / chunks.length) * 100);
-            document.getElementById('batch-progress-bar').style.width = `${pct}%`;
-            logToModalConsole(`🎙️ جاري توليد الدفعة (${c + 1} من ${chunks.length}): [${chunks[c].join(' ، ')}]...`);
+        // 2. تشغيل صوت الكلمة
+        function playWordAudio(wordFull, callback) {
+            const clean = wordFull.replace(/ـ/g, '').trim();
+            const noTashkeel = stripTashkeel(clean);
+            const candidates = [
+                `audio/words/${encodeURIComponent(clean)}.mp3`,
+                `audio/words/${clean}.mp3`,
+                `audio/words/${encodeURIComponent(noTashkeel)}.mp3`,
+                `audio/words/${noTashkeel}.mp3`
+            ];
+            playAudio(candidates, callback);
+        }
 
+        // 3. تشغيل صوت السؤال ("أين هي كلمة ...؟")
+        function playQuestionAudio(wordFull, callback) {
+            const clean = wordFull.replace(/ـ/g, '').trim();
+            const noTashkeel = stripTashkeel(clean);
+            const candidates = [
+                `audio/questions/${encodeURIComponent(clean)}.mp3`,
+                `audio/questions/${clean}.mp3`,
+                `audio/questions/${encodeURIComponent(noTashkeel)}.mp3`,
+                `audio/questions/${noTashkeel}.mp3`
+            ];
+            playAudio(candidates, callback);
+        }
+
+        // 4. جمل التعزيز الإيجابية عند الإجابة الصحيحة
+        const femalePraiseList = [
+            'أَحْسَنْتِ!', 'مُمْتَازَة!', 'رَائِعَة!', 'مُذْهِلَة!',
+            'عَبْقَرِيَّة!', 'فَخُورَةٌ_بِكِ!', 'إِجَابَةٌ_صَحِيحَة!', 'أَنْتِ_الأَفْضَل!'
+        ];
+        const malePraiseList = [
+            'أَحْسَنْتَ!', 'مُمْتَاز!', 'رَائِع!', 'مُذْهِل!',
+            'عَبْقَرِي!', 'فَخُورٌ_بِكَ!', 'إِجَابَةٌ_صَحِيحَة!', 'أَنْتَ_الأَفْضَل!'
+        ];
+
+        function playPraiseAudio(callback) {
+            const isBoy = currentGender === 'boy';
+            const list = isBoy ? malePraiseList : femalePraiseList;
+            const choice = list[Math.floor(Math.random() * list.length)];
+            const noTashkeel = stripTashkeel(choice);
+            const candidates = [
+                `audio/phrases/${encodeURIComponent(choice)}.mp3`,
+                `audio/phrases/${choice}.mp3`,
+                `audio/phrases/${encodeURIComponent(noTashkeel)}.mp3`,
+                `audio/phrases/${noTashkeel}.mp3`
+            ];
+            playAudio(candidates, callback);
+        }
+
+        // 5. رسائل التشجيع عند الإجابة الخاطئة
+        const femaleTryAgainList = [
+            'حَاوِلِي_مَرَّةً_أُخْرَى', 'أَثِقُ_بِقُدْرَتِكِ', 'لَا_بَأْسَ،_جَرِّبِي_مُجَدَّداً',
+            'اسْتَمِرِّي_بِالمُحَاوَلَة', 'رَكِّزِي_قَلِيلاً_وَسَتَنْجَحِين'
+        ];
+        const maleTryAgainList = [
+            'حَاوِلْ_مَرَّةً_أُخْرَى', 'أَثِقُ_بِقُدْرَتِكَ', 'لَا_بَأْسَ،_جَرِّبْ_مُجَدَّداً',
+            'اسْتَمِرَّ_بِالمُحَاوَلَة', 'رَكِّزْ_قَلِيلاً_وَسَتَنْجَح'
+        ];
+
+        function playTryAgainAudio(callback) {
+            const isBoy = currentGender === 'boy';
+            const list = isBoy ? maleTryAgainList : femaleTryAgainList;
+            const choice = list[Math.floor(Math.random() * list.length)];
+            const noTashkeel = stripTashkeel(choice);
+            const candidates = [
+                `audio/phrases/${encodeURIComponent(choice)}.mp3`,
+                `audio/phrases/${choice}.mp3`,
+                `audio/phrases/${encodeURIComponent(noTashkeel)}.mp3`,
+                `audio/phrases/${noTashkeel}.mp3`
+            ];
+            playAudio(candidates, callback);
+        }
+
+        // ================== مؤثرات صوتية (تعمل أوفلاين 100%) ==================
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playTone(freq, duration, type = 'sine', volume = 0.3) {
             try {
-                await requestGeminiBatchTTS(chunks[c]);
-            } catch (err) {
-                logToModalConsole(`❌ توقف عند الدفعة ${c + 1}: ${err.message}`);
-                return;
+                initAudio();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { /* تجاهل أخطاء الصوت */ }
+        }
+
+        function playClickSound() { playTone(800, 0.05, 'sine', 0.2); }
+        function playNextSound() { playTone(600, 0.1, 'square', 0.15); }
+        function playCorrectSound() { 
+            setTimeout(() => playTone(523, 0.15, 'sine', 0.2), 0);
+            setTimeout(() => playTone(659, 0.15, 'sine', 0.2), 150);
+            setTimeout(() => playTone(784, 0.2, 'sine', 0.25), 300);
+        }
+        function playWrongSound() { 
+            setTimeout(() => playTone(400, 0.2, 'sawtooth', 0.15), 0);
+            setTimeout(() => playTone(300, 0.3, 'sawtooth', 0.15), 250);
+        }
+
+        // ================== المتغيرات العامة ==================
+        let currentLevelIdx = 0, currentWordIdx = 0, currentGameMode = 'menu';
+        let currentTestQuestionIdx = 0, testErrors = 0;
+        let testPool = [], testOrder = [], currentTargetWord = null;
+        let selectedOptionWord = null;
+        let isConfirming = false;
+
+        const gameContainer = document.getElementById('game-container');
+        function resizeGame() {
+            const w = window.innerWidth, h = window.innerHeight, ratio = 1280 / 720;
+            let scale = 1;
+            if (w / h > ratio) scale = h / 720;
+            else scale = w / 1280;
+            gameContainer.style.transform = `scale(${scale})`;
+        }
+        window.addEventListener('resize', resizeGame); resizeGame();
+
+        function updateStarsBar() {
+            let totalStars = 0;
+            for(let i=0; i<TOTAL_LEVELS; i++) totalStars += levels[i].stars;
+            document.getElementById('stars-count').innerText = `⭐ ${totalStars} / ${MAX_STARS}`;
+            document.getElementById('progress-fill').style.width = `${(totalStars / MAX_STARS) * 100}%`;
+        }
+
+        function renderMenu(page = 0) {
+            stopCurrentAudio();
+            document.getElementById('menu-screen').style.display = 'flex';
+            document.getElementById('game-screen').style.display = 'none';
+            testScreen.style.display = 'none';
+            document.getElementById('level-complete').style.display = 'none';
+            currentGameMode = 'menu';
+            updateStarsBar();
+            updateGenderUI();
+
+            const itemsPerPage = 8, totalPages = Math.ceil(TOTAL_LEVELS / itemsPerPage);
+            const start = page * itemsPerPage, end = Math.min(start + itemsPerPage, TOTAL_LEVELS);
+            const grid = document.getElementById('level-grid'); grid.innerHTML = '';
+
+            for (let i = start; i < end; i++) {
+                const btn = document.createElement('div'); btn.className = 'level-btn';
+                btn.innerText = `${i+1}`;
+                const starsDiv = document.createElement('div'); starsDiv.className = 'stars';
+                const starCount = levels[i].stars;
+                starsDiv.innerHTML = (starCount>0?'⭐'.repeat(starCount):'') + '<span class="empty">☆</span>'.repeat(3-starCount);
+                btn.appendChild(starsDiv);
+                btn.onclick = () => startLevel(i);
+                grid.appendChild(btn);
             }
 
-            const donePct = Math.round(((c + 1) / chunks.length) * 100);
-            document.getElementById('batch-progress-bar').style.width = `${donePct}%`;
+            document.getElementById('prev-page').style.display = (page > 0) ? 'block' : 'none';
+            document.getElementById('next-page').style.display = (page < totalPages - 1) ? 'block' : 'none';
+            document.getElementById('prev-page').onclick = () => renderMenu(page - 1);
+            document.getElementById('next-page').onclick = () => renderMenu(page + 1);
+        }
 
-            if (c < chunks.length - 1 && !stopBatchRequested) {
-                const pauseSec = ((c + 1) % 2 === 0) ? 21 : 4;
-                for (let s = pauseSec; s > 0; s--) {
-                    if (stopBatchRequested) break;
-                    logToModalConsole(`✅ تم حفظ الدفعة ${c + 1}/${chunks.length}. تهدئة ${s} ثانية لاحترام حصة Google المجانية (منع خطأ 429)...`);
-                    await new Promise(r => setTimeout(r, 1000));
+        document.getElementById('fullscreen-btn').onclick = () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => {});
+            else if (document.exitFullscreen) document.exitFullscreen();
+        };
+
+        document.getElementById('reset-btn').onclick = () => {
+            if(confirm('هل أنت متأكد من رغبتك في حذف جميع النجوم وإعادة التقدم للصفر؟')) {
+                for(let i=0; i<TOTAL_LEVELS; i++) {
+                    levels[i].stars = 0;
+                    localStorage.removeItem(`level_${i}_stars`);
                 }
-            }
-        }
-
-        if (!stopBatchRequested) {
-            logToModalConsole(`🎉 اكتمل توليد وحفظ ${label} بنجاح! يمكنك الآن تنزيل ملف audio_pack.json أو تصدير اللعبة الشاملة.`);
-            showToast('🎉 اكتمل توليد وحفظ الأصوات بنجاح!');
-        }
-    }
-
-    // ================== 11. تصدير واستيراد audio_pack.json أو HTML الشامل ==================
-    document.getElementById('btn-export-json').onclick = () => {
-        if (memoryAudioCache.size === 0) {
-            alert('لا توجد أصوات محفوظة لتصديرها بعد.');
-            return;
-        }
-        const obj = Object.fromEntries(memoryAudioCache);
-        const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'audio_pack.json';
-        a.click();
-        logToModalConsole(`💾 تم تنزيل audio_pack.json ويحتوي على (${memoryAudioCache.size}) مقطعاً صوتياً.`);
-    };
-
-    document.getElementById('btn-import-json').onclick = () => {
-        document.getElementById('import-json-file-input').click();
-    };
-
-    document.getElementById('import-json-file-input').onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-            try {
-                const data = JSON.parse(ev.target.result);
-                let count = 0;
-                for (const [k, v] of Object.entries(data)) {
-                    await saveAudioClipToDB(k, v);
-                    count++;
-                }
-                updateAudioPackUIStatus();
-                renderMenu(currentMenuPage);
-                logToModalConsole(`✅ تم استيراد وحفظ (${count}) صوتاً من الملف بنجاح!`);
-                showToast(`✅ تم استيراد ${count} صوتاً بنجاح!`);
-            } catch (err) {
-                alert('ملف JSON غير صالح.');
+                renderMenu();
             }
         };
-        reader.readAsText(file);
-    };
 
-    document.getElementById('btn-export-single-html').onclick = () => {
-        if (memoryAudioCache.size === 0) {
-            alert('يرجى توليد الأصوات أو استيرادها أولاً قبل تصدير النسخة الشاملة.');
-            return;
+        function startLevel(levelIdx) {
+            stopCurrentAudio();
+            currentLevelIdx = levelIdx; currentWordIdx = 0;
+            currentGameMode = 'spelling'; testErrors = 0;
+            document.getElementById('menu-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            testScreen.style.display = 'none';
+            document.getElementById('level-num').innerText = levelIdx + 1;
+            testOptions.innerHTML = '';
+            resetCircles();
+            updateGenderUI();
+            startSpelling();
         }
-        const cloneDoc = document.documentElement.cloneNode(true);
-        const embedScript = cloneDoc.querySelector('#embedded-audio-pack');
-        embedScript.textContent = JSON.stringify(Object.fromEntries(memoryAudioCache));
-        const modalEl = cloneDoc.querySelector('#gemini-modal');
-        if (modalEl) modalEl.style.display = 'none';
 
-        const htmlContent = '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
-        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'spelling_game_smartboard_offline.html';
-        a.click();
-        logToModalConsole('📦 تم تصدير ملف (spelling_game_smartboard_offline.html) شامل جميع الأصوات بداخله!');
-    };
-
-    document.getElementById('btn-clear-db').onclick = async () => {
-        if (confirm('هل تريد مسح جميع الأصوات المحفوظة من المتصفح؟')) {
-            await clearAllAudioFromDB();
-            logToModalConsole('🗑️ تم مسح ذاكرة الأصوات بنجاح.');
+        function resetCircles() {
+            document.getElementById('circle2').classList.remove('visible');
+            document.getElementById('circle3').classList.remove('visible');
+            document.getElementById('circle1').classList.add('visible');
+            listenBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
         }
-    };
 
-    async function checkEmbeddedOrOptionalJson(manualTrigger = false) {
-        try {
-            const rawEmbed = document.getElementById('embedded-audio-pack').textContent.trim();
-            if (rawEmbed && rawEmbed.length > 5) {
-                const parsed = JSON.parse(rawEmbed);
-                for (const [k, v] of Object.entries(parsed)) {
-                    await saveAudioClipToDB(k, v);
-                }
+        // ================== طور التهجئة ==================
+        function startSpelling() {
+            const word = levels[currentLevelIdx].words[currentWordIdx];
+            const letter1 = formatLetter(word.l1, true);
+            const letter2 = formatLetter(word.l2, true);
+            const letter3 = word.l3;
+
+            wordDisplay.innerHTML = `<span><c1>${letter1}</c1></span><span><c2>${letter2}</c2></span><span><c3>${letter3}</c3></span>`;
+            resetCircles();
+        }
+
+        function handleCircleClick(letterIndex) {
+            if (currentGameMode !== 'spelling') return;
+            const word = levels[currentLevelIdx].words[currentWordIdx];
+            const letters = [word.l1, word.l2, word.l3];
+            const l = letters[letterIndex - 1];
+            const letterFormatted = (letterIndex < 3) ? formatLetter(l, true) : l;
+
+            const spans = document.querySelectorAll('#word-display span');
+            if(spans.length < 3) return;
+            spans[letterIndex - 1].innerHTML = `<c${letterIndex}a>${letterFormatted}</c${letterIndex}a>`;
+
+            // تشغيل صوت الحرف من ملفات الصوت الحقيقية
+            playLetterAudio(l);
+
+            setTimeout(() => {
+                spans[letterIndex - 1].innerHTML = `<c${letterIndex}>${letterFormatted}</c${letterIndex}>`;
+            }, 500);
+
+            if (letterIndex === 1) setTimeout(() => document.getElementById('circle2').classList.add('visible'), 500);
+            else if (letterIndex === 2) setTimeout(() => document.getElementById('circle3').classList.add('visible'), 500);
+            else if (letterIndex === 3) setTimeout(() => { listenBtn.style.display = 'flex'; }, 600);
+        }
+
+        document.getElementById('circle1').onclick = () => handleCircleClick(1);
+        document.getElementById('circle2').onclick = () => handleCircleClick(2);
+        document.getElementById('circle3').onclick = () => handleCircleClick(3);
+
+        listenBtn.onclick = () => {
+            const word = levels[currentLevelIdx].words[currentWordIdx];
+            // تشغيل صوت الكلمة من ملفات الصوت الحقيقية
+            playWordAudio(word.full, () => {
+                setTimeout(() => { nextBtn.style.display = 'block'; }, 200);
+            });
+        };
+
+        nextBtn.onclick = () => {
+            playNextSound();
+            currentWordIdx++;
+            if (currentWordIdx < WORDS_PER_LEVEL) startSpelling();
+            else startTesting();
+        };
+
+        // ================== طور الاختبار ==================
+        function startTesting() {
+            currentGameMode = 'testing';
+            document.getElementById('game-screen').style.display = 'none';
+            testScreen.style.display = 'flex';
+            confirmBtn.classList.remove('active');
+            confirmBtn.style.pointerEvents = 'none';
+
+            testPool = []; 
+            for (let i = 0; i <= currentLevelIdx; i++) levels[i].words.forEach(w => testPool.push(w));
+
+            const currentWords = levels[currentLevelIdx].words;
+            testOrder = shuffleArray([...currentWords]);
+            const shuffledReviews = shuffleArray(testPool.filter(w => !currentWords.includes(w)));
+            testOrder = testOrder.concat(shuffledReviews.slice(0, Math.min(3, shuffledReviews.length)));
+
+            currentTestQuestionIdx = 0;
+            testErrors = 0; // تتبع عدد الأخطاء لتحديد عدد النجوم المستحقة
+            showTestQuestion(testOrder);
+        }
+
+        function showTestQuestion(order) {
+            if (currentTestQuestionIdx >= order.length) { finishLevel(); return; }
+
+            currentTargetWord = order[currentTestQuestionIdx];
+            const wrongOptionsCount = (currentLevelIdx === 0) ? 1 : 3;
+            let wrongOptions = shuffleArray(testPool.filter(w => w.full !== currentTargetWord.full)).slice(0, wrongOptionsCount);
+            let allOptions = shuffleArray([currentTargetWord, ...wrongOptions]);
+
+            testQuestion.innerText = '🔊'; 
+            testOptions.innerHTML = '';
+            selectedOptionWord = null;
+            confirmBtn.classList.remove('active');
+            confirmBtn.style.pointerEvents = 'none';
+            isConfirming = false;
+
+            allOptions.forEach(wordObj => {
+                const btn = document.createElement('div');
+                btn.className = 'test-option-btn';
+                const l1f = formatLetter(wordObj.l1, true);
+                const l2f = formatLetter(wordObj.l2, true);
+                const l3 = wordObj.l3;
+                btn.innerHTML = `<word><span><c1>${l1f}</c1></span><span><c2>${l2f}</c2></span><span><c3>${l3}</c3></span></word>`;
+                
+                btn.onclick = () => {
+                    if (isConfirming) return;
+                    playClickSound();
+                    document.querySelectorAll('.test-option-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOptionWord = wordObj;
+                    confirmBtn.classList.add('active');
+                    confirmBtn.style.pointerEvents = 'all';
+                };
+                testOptions.appendChild(btn);
+            });
+
+            // نطق السؤال أوتوماتيكياً من ملفات الأسئلة الصوتية
+            setTimeout(() => { playQuestionAudio(currentTargetWord.full); }, 300);
+        }
+
+        speakQBtn.onclick = () => {
+            playQuestionAudio(currentTargetWord.full);
+        };
+
+        confirmBtn.onclick = () => {
+            if (!selectedOptionWord || isConfirming) return;
+            isConfirming = true;
+            const allBtns = document.querySelectorAll('.test-option-btn');
+            const selectedBtn = Array.from(allBtns).find(b => b.classList.contains('selected'));
+            
+            if (selectedOptionWord.full === currentTargetWord.full) {
+                playCorrectSound();
+                selectedBtn.classList.remove('selected');
+                selectedBtn.classList.add('correct');
+                confirmBtn.classList.remove('active');
+                confirmBtn.style.pointerEvents = 'none';
+                
+                // تشغيل عبارة التعزيز الإيجابية المناسبة لجنس الطالب (طالب / طالبة)
+                setTimeout(() => { playPraiseAudio(); }, 350);
+
+                setTimeout(() => {
+                    isConfirming = false;
+                    currentTestQuestionIdx++;
+                    showTestQuestion(testOrder);
+                }, 1300);
+            } else {
+                playWrongSound();
+                testErrors++; // زيادة عدد الأخطاء المسجلة
+                selectedBtn.classList.remove('selected');
+                selectedBtn.classList.add('wrong');
+                confirmBtn.classList.remove('active');
+                confirmBtn.style.pointerEvents = 'none';
+
+                // تشغيل رسالة التشجيع المناسبة لجنس الطالب (طالب / طالبة)
+                setTimeout(() => { playTryAgainAudio(); }, 350);
+
+                setTimeout(() => {
+                    selectedBtn.classList.remove('wrong');
+                    selectedBtn.style.pointerEvents = 'all';
+                    selectedOptionWord = null;
+                    isConfirming = false;
+                }, 1500);
             }
-        } catch (e) {}
+        };
 
-        if (manualTrigger) {
-            try {
-                const res = await fetch('./audio_pack.json', { cache: 'no-store' });
-                if (res.ok) {
-                    const data = await res.json();
-                    let count = 0;
-                    for (const [k, v] of Object.entries(data)) {
-                        await saveAudioClipToDB(k, v);
-                        count++;
-                    }
-                    updateAudioPackUIStatus();
-                    renderMenu(currentMenuPage);
-                    logToModalConsole(`✅ تم قراءة ملف audio_pack.json المجاور بنجاح (${count} صوتاً)!`);
-                    showToast(`✅ تم تحميل audio_pack.json (${count} صوتاً)`);
-                } else {
-                    logToModalConsole('ℹ️ لم يتم العثور على ملف audio_pack.json في نفس المجلد. استخدم زر (استيراد ملف) لاختياره من جهازك.');
-                }
-            } catch (err) {
-                logToModalConsole('ℹ️ المتصفح يمنع قراءة الملفات المجاورة تلقائياً بدون خادم. استخدم زر (📂 استيراد ملف audio_pack.json) لاختيار الملف مباشرة.');
+        // ================== نظام التقييم وتوزيع النجوم ==================
+        function finishLevel() {
+            // تقل عدد النجوم بحسب عدد الأخطاء في المرحلة:
+            // 0 أخطاء = 3 نجوم (إتقان تام)
+            // 1 إلى 2 أخطاء = نجمتان (أداء جيد)
+            // 3 أخطاء أو أكثر = نجمة واحدة (تشجيع وحث على إعادة المحاولة)
+            let earnedStars = 3;
+            if (testErrors === 0) {
+                earnedStars = 3;
+            } else if (testErrors <= 2) {
+                earnedStars = 2;
+            } else {
+                earnedStars = 1;
             }
+
+            // حفظ أفضل نتيجة حققها الطالب
+            if (earnedStars > levels[currentLevelIdx].stars) {
+                levels[currentLevelIdx].stars = earnedStars;
+                localStorage.setItem(`level_${currentLevelIdx}_stars`, earnedStars);
+            }
+
+            testScreen.style.display = 'none';
+            const completeDiv = document.getElementById('level-complete');
+            completeDiv.style.display = 'flex';
+            
+            let starsHTML = '';
+            for(let i=0; i<3; i++) {
+                if(i < earnedStars) starsHTML += '⭐';
+                else starsHTML += '<span style="color: #bbb;">☆</span>';
+            }
+            document.getElementById('complete-stars').innerHTML = starsHTML;
+
+            const isBoy = currentGender === 'boy';
+            let msg = '';
+            if (earnedStars === 3) {
+                msg = isBoy 
+                    ? `ممتاز يا بطل! أنهيتَ المرحلة بإتقان تام وبدون أي أخطاء! (3 نجوم ⭐⭐⭐)`
+                    : `ممتازة يا بطلة! أنهيتِ المرحلة بإتقان تام وبدون أي أخطاء! (3 نجوم ⭐⭐⭐)`;
+            } else if (earnedStars === 2) {
+                msg = isBoy 
+                    ? `أحسنتَ! حصلتَ على نجمتين ⭐⭐ (عدد الأخطاء: ${testErrors}). حَاول مجدداً لنيل 3 نجوم!`
+                    : `أحسنتِ! حصلتِ على نجمتين ⭐⭐ (عدد الأخطاء: ${testErrors}). حَاولي مجدداً لنيل 3 نجوم!`;
+            } else {
+                msg = isBoy 
+                    ? `بطل! أنهيتَ المرحلة وحصلتَ على نجمة ⭐ (عدد الأخطاء: ${testErrors}). تدرّب أكثر لتحصل على 3 نجوم!`
+                    : `بطلة! أنهيتِ المرحلة وحصلتِ على نجمة ⭐ (عدد الأخطاء: ${testErrors}). تدرّبي أكثر لتحصلي على 3 نجوم!`;
+            }
+            document.getElementById('complete-msg').innerText = msg;
         }
-    }
 
-    document.getElementById('btn-try-autoload-json').onclick = () => checkEmbeddedOrOptionalJson(true);
+        document.getElementById('complete-btn').onclick = () => {
+            stopCurrentAudio();
+            document.getElementById('level-complete').style.display = 'none';
+            renderMenu();
+        };
 
-    // تشغيل التهيئة عند فتح اللعبة
-    (async function initApp() {
-        await loadAllFromDBToMemory();
-        await checkEmbeddedOrOptionalJson(false);
-        renderMenu(0);
-    })();
-</script>
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+            return arr;
+        }
+
+        document.getElementById('back-btn').onclick = () => {
+            stopCurrentAudio();
+            renderMenu();
+        };
+
+        renderMenu();
+        resizeGame();
+    </script>
 </body>
 </html>
