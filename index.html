@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة التهجئة التفاعلية</title>
     <style>
         @font-face {
@@ -21,56 +21,67 @@
         }
 
         body {
-            margin: 0; padding: 0; background: #2b2b2b; overflow: hidden; touch-action: manipulation;
+            margin: 0; padding: 0; background: #1d2833; overflow: hidden; touch-action: manipulation;
             user-select: none; -webkit-user-select: none; font-family: 'MyCustomFont', 'Arial', 'Tahoma', sans-serif;
             position: fixed; inset: 0;
             height: 100vh; height: 100dvh; width: 100vw; width: 100dvw;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        button:focus-visible, [tabindex]:focus-visible {
+            outline: 4px solid #f1c40f;
+            outline-offset: 4px;
         }
 
         #game-container {
             width: 1280px; height: 720px; position: absolute;
             top: 50%; left: 50%;
             flex-shrink: 0;
-            background-color: #bfe3f7;
-            background-image: url('background.svg');
+            /* خلفية باستيل هادئة قليلة التوهج ومناسبة للطلبة ذوي صعوبات التعلم */
+            background-color: #eef6f4;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><defs><linearGradient id='sky' x1='0' y1='0' x2='0' y2='1'><stop offset='0%25' stop-color='%23dfeff0'/><stop offset='65%25' stop-color='%23eef6f4'/><stop offset='100%25' stop-color='%23f7f5eb'/></linearGradient></defs><rect width='1280' height='720' fill='url(%23sky)'/><circle cx='140' cy='115' r='60' fill='%23faecc8' opacity='0.65'/><path d='M0,565 Q340,490 680,550 T1280,515 L1280,720 L0,720 Z' fill='%23c5dfc9'/><path d='M0,615 Q430,555 860,610 T1280,585 L1280,720 L0,720 Z' fill='%23a6ccb0'/></svg>");
             background-size: cover; background-position: center;
             overflow: hidden; transform-origin: center center;
             transform: translate(-50%, -50%) scale(1);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.45);
         }
 
-        /* ================= القائمة (Glassmorphism) ================= */
+        /* ================= القائمة ================= */
         #menu-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
-            background: rgba(0, 0, 0, 0.25); display: flex; flex-direction: column;
+            background: rgba(238, 246, 244, 0.28); display: flex; flex-direction: column;
             align-items: center; justify-content: center;
         }
 
-        #menu-header { color: #fff; font-size: 40px; margin-bottom: 15px; font-weight: bold; text-shadow: 0 4px 15px rgba(0,0,0,0.7); }
+        #menu-header { color: #182b3a; font-size: 40px; margin-bottom: 15px; font-weight: bold; margin-top: 35px; }
         
-        #top-bar { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 20px; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); width: 75%; justify-content: space-between; }
-        #stars-count { color: #fff; font-size: 22px; font-weight: bold; min-width: 100px; text-align: center; }
-        #progress-bg { flex-grow: 1; height: 12px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; position: relative; }
+        #top-bar { position: absolute; top: 26px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 18px; background: #182b3a; padding: 10px 22px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.16); width: 78%; justify-content: space-between; box-shadow: 0 6px 18px rgba(0,0,0,0.22); }
+        #stars-count { color: #ffffff; font-size: 22px; font-weight: bold; min-width: 110px; text-align: center; font-variant-numeric: tabular-nums; }
+        #progress-bg { flex-grow: 1; height: 12px; background: rgba(255,255,255,0.22); border-radius: 10px; overflow: hidden; position: relative; }
         #progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); border-radius: 10px; transition: width 0.5s ease; }
-        #top-controls { display: flex; gap: 10px; align-items: center; }
-        .top-btn { background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .top-btn:active { transform: scale(0.9); }
+        #top-controls { display: flex; gap: 14px; align-items: center; }
+        .top-btn { background: #ffffff; color: #182b3a; border: 2px solid #cbd5e1; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.18); padding: 0; }
+        .top-btn:active { transform: scale(0.92); }
+        #reset-btn { margin-inline-end: 10px; border-color: #fecaca; color: #991b1b; background: #fff5f5; }
 
         /* زر التبديل بين وضع طالب ووضع طالبة */
         .gender-toggle-btn {
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid rgba(255, 255, 255, 0.7);
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
             border-radius: 20px;
             padding: 7px 18px;
             font-size: 18px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #182b3a;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.16);
             transition: transform 0.2s, background-color 0.2s;
             user-select: none;
         }
@@ -78,32 +89,49 @@
             transform: scale(0.92);
         }
 
-        #level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; padding: 30px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); max-width: 850px; margin-top: 50px; }
+        #level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding: 28px; background: rgba(255, 255, 255, 0.88); border-radius: 28px; border: 2px solid #cbd5e1; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14); max-width: 850px; margin-top: 20px; }
 
-        .level-btn { width: 120px; height: 120px; background: rgba(255, 255, 255, 0.85); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #222; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-        .level-btn:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .level-btn .stars { font-size: 26px; margin-top: 5px; letter-spacing: 3px; }
-        .level-btn .stars .empty { color: #ccc; }
+        .level-btn { width: 120px; height: 120px; background: #ffffff; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #182b3a; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 0; font-variant-numeric: tabular-nums; }
+        .level-btn:active { transform: scale(0.95); box-shadow: 0 2px 6px rgba(0,0,0,0.16); }
+        .level-btn .stars { font-size: 24px; margin-top: 4px; letter-spacing: 2px; }
+        .level-btn .stars .empty { color: #cbd5e1; }
 
-        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; font-size: 45px; padding: 10px 18px; border-radius: 15px; cursor: pointer; z-index: 11; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .nav-arrow:active { transform: translateY(-50%) scale(0.9); }
-        #prev-page { right: 20px; left: auto; }
-        #next-page { left: 20px; right: auto; }
+        .nav-arrow { position: absolute; top: 52%; transform: translateY(-50%); background: #ffffff; color: #182b3a; border: 2px solid #cbd5e1; font-size: 44px; padding: 8px 18px; border-radius: 15px; cursor: pointer; z-index: 11; box-shadow: 0 4px 12px rgba(0,0,0,0.16); }
+        .nav-arrow:active { transform: translateY(-50%) scale(0.92); }
+        #prev-page { right: 24px; left: auto; }
+        #next-page { left: 24px; right: auto; }
 
         /* ================= شاشة اللعبة ================= */
         #game-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 5; background: transparent; }
         #word-container { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; }
-        word { display: inline-block; direction: rtl; font-family: 'MyCustomFont', 'Arial', 'Tahoma', sans-serif !important; font-size: 220px; font-weight: bold; color: black; text-shadow: 0 0 15px rgba(255,255,255,0.8); pointer-events: none; white-space: nowrap; letter-spacing: 0; }
+        word { display: inline-block; direction: rtl; font-family: 'MyCustomFont', 'Arial', 'Tahoma', sans-serif !important; font-size: 220px; font-weight: bold; color: #182b3a; pointer-events: none; white-space: nowrap; letter-spacing: 0; }
+
+        word span { display: inline; position: relative; transition: opacity 0.15s ease; }
+        word span:nth-child(1) { z-index: 1; }
+        word span:nth-child(2) { z-index: 2; }
+        word span:nth-child(3) { z-index: 3; }
+        word span.dimmed { opacity: 0.32; }
 
         c1, c2, c3 { display: inline; position: static; font-family: 'MyCustomFont', 'Arial', 'Tahoma', sans-serif !important; font-size: inherit; font-weight: inherit; color: inherit; pointer-events: none; letter-spacing: 0; }
         c1 { color: #e74c3c !important; } c2 { color: #27ae60 !important; } c3 { color: #3498db !important; }
 
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
-        c1a, c2a, c3a { display: inline-block; position: relative; font-family: 'MyCustomFont', 'Arial', 'Tahoma', sans-serif !important; font-size: inherit; font-weight: inherit; animation: pulse 0.5s ease forwards; transform-origin: center; pointer-events: none; }
+        @keyframes pulse { 0% { transform: translateY(0) scale(1); } 25% { transform: translateY(-12px) scale(1.22); } 75% { transform: translateY(-12px) scale(1.22); } 100% { transform: translateY(0) scale(1); } }
+        c1a, c2a, c3a { display: inline-block; position: relative; font-family: 'MyCustomFont', 'Arial', 'Tahoma', sans-serif !important; font-size: inherit; font-weight: inherit; animation: pulse 1.1s ease forwards; transform-origin: center; pointer-events: none; background-color: rgba(241, 196, 15, 0.28); border-radius: 18px; }
         c1a { color: #e74c3c !important; } c2a { color: #27ae60 !important; } c3a { color: #3498db !important; }
 
+        body.audio-locked .circle.visible,
+        body.audio-locked #listen-btn,
+        body.audio-locked #next-word-btn,
+        body.audio-locked #speak-q-btn,
+        body.audio-locked .test-option-btn,
+        body.audio-locked #confirm-btn.active {
+            opacity: 0.55;
+            pointer-events: none;
+            cursor: wait;
+        }
+
         #circles-container { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; gap: 80px; }
-        .circle { width: 80px; height: 80px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s, opacity 0.5s ease; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; font-weight: bold; position: relative; opacity: 0; pointer-events: none; }
+        .circle { width: 80px; height: 80px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.22); transition: transform 0.2s, opacity 0.4s ease; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; font-weight: bold; position: relative; opacity: 0; pointer-events: none; padding: 0; }
         .circle:active { transform: scale(0.9); }
         .circle.visible { opacity: 1; pointer-events: all; }
         .circle-red { background: #e74c3c; border: 4px solid #c0392b; }
@@ -111,44 +139,67 @@
         .circle-blue { background: #3498db; border: 4px solid #2471a3; }
 
         #controls-area { position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; align-items: center; justify-content: center; }
-        #listen-btn { width: 70px; height: 70px; background: rgba(255,255,255,0.9); border-radius: 50%; border: 3px solid #2c3e50; cursor: pointer; font-size: 30px; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; }
+        #listen-btn { width: 70px; height: 70px; background: #ffffff; border-radius: 50%; border: 3px solid #182b3a; cursor: pointer; font-size: 30px; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.18); transition: transform 0.2s; padding: 0; }
         #listen-btn:active { transform: scale(0.95); }
-        #next-word-btn { position: absolute; left: 20px; bottom: 120px; background: rgba(255,255,255,0.95); border: none; padding: 15px 25px; border-radius: 15px; font-size: 22px; cursor: pointer; font-weight: bold; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; }
+        #next-word-btn { position: absolute; left: 24px; bottom: 120px; background: #182b3a; color: #ffffff; border: none; padding: 15px 28px; border-radius: 15px; font-size: 22px; cursor: pointer; font-weight: bold; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.22); transition: transform 0.2s; }
         #next-word-btn:active { transform: scale(0.95); }
 
-        #level-progress { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 20px; background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 10px; }
+        #level-progress, #test-progress { position: absolute; top: 20px; left: 20px; color: #ffffff; font-size: 20px; font-weight: bold; background: #182b3a; padding: 10px 20px; border-radius: 12px; font-variant-numeric: tabular-nums; }
         #game-gender-btn { position: absolute; top: 20px; right: 125px; }
-        #back-btn { position: absolute; top: 20px; right: 20px; padding: 10px 25px; background: #e74c3c; color: #fff; border: none; border-radius: 12px; font-size: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: 0.2s; }
+        #back-btn, #test-back-btn { position: absolute; top: 20px; right: 20px; padding: 10px 25px; background: #c0392b; color: #ffffff; border: none; border-radius: 12px; font-size: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.22); transition: transform 0.2s; }
+        #back-btn:active, #test-back-btn:active { transform: scale(0.95); }
 
         /* ================= طور الاختبار ================= */
-        #test-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 6; background: rgba(0,0,0,0.35); flex-direction: column; align-items: center; justify-content: center; }
+        #test-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 6; background: rgba(24, 43, 58, 0.25); flex-direction: column; align-items: center; justify-content: center; }
         #test-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
-        #test-speaker-icon { font-size: 60px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        #speak-q-btn { width: 60px; height: 60px; background: rgba(255,255,255,0.9); border-radius: 50%; border: none; cursor: pointer; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        #speak-q-btn:active { transform: scale(0.9); }
+        #test-speaker-icon { font-size: 60px; color: #182b3a; }
+        #speak-q-btn { width: 64px; height: 64px; background: #ffffff; border: 3px solid #182b3a; border-radius: 50%; cursor: pointer; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.18); padding: 0; }
+        #speak-q-btn:active { transform: scale(0.92); }
 
-        #test-options { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; width: 650px; }
-        .test-option-btn { background: rgba(255,255,255,0.9); padding: 25px; border-radius: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; display: flex; justify-content: center; align-items: center; border: 4px solid transparent; min-height: 100px; }
-        .test-option-btn:active { transform: scale(0.95); }
-        .test-option-btn word { font-size: 40px; }
+        #test-options { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 650px; }
+        .test-option-btn { background: #ffffff; padding: 24px; border-radius: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.14); transition: transform 0.2s, border-color 0.2s, background-color 0.2s; display: flex; justify-content: center; align-items: center; border: 4px solid #cbd5e1; min-height: 104px; width: 100%; }
+        .test-option-btn:active { transform: scale(0.96); }
+        .test-option-btn word { font-size: 44px; }
         
-        .test-option-btn.selected { border-color: #3498db; background: rgba(52, 152, 219, 0.2); transform: scale(1.02); }
-        .test-option-btn.correct { border-color: #2ecc71; background: rgba(46, 204, 113, 0.2); }
-        .test-option-btn.wrong { border-color: #e74c3c; background: rgba(231, 76, 60, 0.2); }
+        .test-option-btn.selected { border-color: #2980b9; background: #ebf5fb; transform: scale(1.02); }
+        .test-option-btn.correct { border-color: #27ae60; background: #eafaf1; }
+        .test-option-btn.wrong { border-color: #c0392b; background: #fdedec; }
         
-        #confirm-btn-area { margin-top: 40px; display: flex; align-items: center; justify-content: center; }
-        #confirm-btn { background: rgba(255,255,255,0.95); border: none; padding: 15px 50px; border-radius: 20px; font-size: 28px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); opacity: 0.4; pointer-events: none; transition: 0.2s; }
-        #confirm-btn.active { opacity: 1; pointer-events: all; background: #2ecc71; color: #fff; }
-        #confirm-btn.active:active { transform: scale(0.9); }
+        #confirm-btn-area { margin-top: 36px; display: flex; align-items: center; justify-content: center; }
+        #confirm-btn { background: #ffffff; color: #64748b; border: 2px solid #cbd5e1; padding: 15px 50px; border-radius: 20px; font-size: 28px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.18); opacity: 0.55; pointer-events: none; transition: transform 0.2s, opacity 0.2s, background-color 0.2s; }
+        #confirm-btn.active { opacity: 1; pointer-events: all; background: #27ae60; color: #ffffff; border-color: #1e8449; }
+        #confirm-btn.active:active { transform: scale(0.94); }
 
-        /* ================= رسالة نهاية المرحلة ================= */
-        #level-complete { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 20; background: rgba(0, 0, 0, 0.7); flex-direction: column; align-items: center; justify-content: center; }
-        #complete-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 50px; border-radius: 40px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); max-width: 540px; width: 85%; }
-        #complete-title { font-size: 36px; color: #2c3e50; font-weight: bold; margin-bottom: 15px; }
+        /* ================= رسالة نهاية المرحلة ومربع الحوار ================= */
+        #level-complete { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 20; background: rgba(24, 43, 58, 0.72); flex-direction: column; align-items: center; justify-content: center; }
+        #complete-box { background: #ffffff; padding: 48px; border-radius: 36px; text-align: center; box-shadow: 0 12px 36px rgba(0,0,0,0.35); max-width: 540px; width: 85%; border: 3px solid #cbd5e1; }
+        #complete-title { font-size: 36px; color: #182b3a; font-weight: bold; margin-bottom: 15px; }
         #complete-stars { font-size: 50px; letter-spacing: 10px; margin: 20px 0; }
-        #complete-msg { font-size: 22px; color: #555; margin-bottom: 30px; line-height: 1.5; }
-        #complete-btn { background: #3498db; color: #fff; border: none; padding: 15px 40px; border-radius: 20px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        #complete-btn:active { transform: scale(0.9); }
+        #complete-msg { font-size: 22px; color: #334155; margin-bottom: 30px; line-height: 1.5; }
+        #complete-btn { background: #2980b9; color: #ffffff; border: none; padding: 15px 40px; border-radius: 20px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #complete-btn:active { transform: scale(0.94); }
+
+        dialog#reset-dialog { border: 3px solid #cbd5e1; border-radius: 24px; padding: 32px; max-width: 440px; width: 85%; text-align: center; font-family: inherit; box-shadow: 0 12px 32px rgba(0,0,0,0.35); background: #ffffff; color: #182b3a; }
+        dialog#reset-dialog::backdrop { background: rgba(24, 43, 58, 0.65); }
+        .dialog-title { font-size: 26px; font-weight: bold; margin-bottom: 12px; }
+        .dialog-desc { font-size: 19px; color: #475569; margin-bottom: 24px; line-height: 1.5; }
+        .dialog-actions { display: flex; gap: 16px; justify-content: center; }
+        .dialog-btn { padding: 12px 28px; border-radius: 14px; font-size: 20px; font-weight: bold; cursor: pointer; border: none; }
+        .dialog-cancel { background: #e2e8f0; color: #182b3a; }
+        .dialog-confirm { background: #c0392b; color: #ffffff; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+            c1a, c2a, c3a {
+                transform: none !important;
+                background-color: rgba(241, 196, 15, 0.32);
+                border-radius: 18px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -157,59 +208,74 @@
         
         <div id="menu-screen">
             <div id="top-bar">
-                <div id="stars-count">⭐ 0 / 132</div>
-                <div id="progress-bg"><div id="progress-fill"></div></div>
-                <button id="gender-btn" class="gender-toggle-btn" title="تبديل وضع الطالب / الطالبة">👦 طالب</button>
+                <div id="stars-count" aria-live="polite">⭐ 0 / 132</div>
+                <div id="progress-bg" aria-hidden="true"><div id="progress-fill"></div></div>
+                <button type="button" id="gender-btn" class="gender-toggle-btn" title="تبديل وضع الطالب / الطالبة">👦 طالب</button>
                 <div id="top-controls">
-                    <button class="top-btn" id="reset-btn" title="إعادة تعيين النجوم">🔄</button>
-                    <button class="top-btn" id="fullscreen-btn" title="ملء الشاشة">⛶</button>
+                    <button type="button" class="top-btn" id="reset-btn" title="إعادة تعيين النجوم" aria-label="إعادة تعيين النجوم">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                    <button type="button" class="top-btn" id="fullscreen-btn" title="ملء الشاشة" aria-label="ملء الشاشة">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                    </button>
                 </div>
             </div>
 
-            <button id="prev-page" class="nav-arrow">‹</button>
-            <button id="next-page" class="nav-arrow">›</button>
+            <button type="button" id="prev-page" class="nav-arrow" aria-label="الصفحة السابقة">‹</button>
+            <button type="button" id="next-page" class="nav-arrow" aria-label="الصفحة التالية">›</button>
             <div id="menu-header">اختر المرحلة</div>
             <div id="level-grid"></div>
         </div>
 
         <div id="game-screen">
             <div id="level-progress">المرحلة: <span id="level-num">1</span></div>
-            <button id="game-gender-btn" class="gender-toggle-btn" title="تبديل وضع الطالب / الطالبة">👦 طالب</button>
-            <button id="back-btn">رجوع</button>
+            <button type="button" id="game-gender-btn" class="gender-toggle-btn" title="تبديل وضع الطالب / الطالبة">👦 طالب</button>
+            <button type="button" id="back-btn">رجوع</button>
 
-            <div id="word-container"><word id="word-display"></word></div>
+            <div id="word-container"><word id="word-display" aria-live="polite"></word></div>
 
             <div id="circles-container">
-                <div id="circle1" class="circle circle-red visible"></div>
-                <div id="circle2" class="circle circle-green"></div>
-                <div id="circle3" class="circle circle-blue"></div>
+                <button type="button" id="circle1" class="circle circle-red visible" aria-label="نطق الحرف الأول"></button>
+                <button type="button" id="circle2" class="circle circle-green" aria-label="نطق الحرف الثاني"></button>
+                <button type="button" id="circle3" class="circle circle-blue" aria-label="نطق الحرف الثالث"></button>
             </div>
 
             <div id="controls-area">
-                <div id="listen-btn">🔊</div>
+                <button type="button" id="listen-btn" aria-label="استماع للكلمة كاملة">🔊</button>
             </div>
-            <button id="next-word-btn">← التالي</button>
+            <button type="button" id="next-word-btn">← التالي</button>
         </div>
 
         <div id="test-screen">
+            <div id="test-progress" aria-live="polite">السؤال: <span id="test-q-num">1 / 5</span></div>
+            <button type="button" id="test-back-btn">رجوع</button>
             <div id="test-header">
-                <div id="test-speaker-icon"></div>
-                <button id="speak-q-btn">🔊</button>
+                <div id="test-speaker-icon" aria-hidden="true"></div>
+                <button type="button" id="speak-q-btn" aria-label="إعادة سماع السؤال">🔊</button>
             </div>
             <div id="test-options"></div>
             <div id="confirm-btn-area">
-                <button id="confirm-btn">تأكيد الإجابة</button>
+                <button type="button" id="confirm-btn">تأكيد الإجابة</button>
             </div>
         </div>
 
         <div id="level-complete">
             <div id="complete-box">
                 <div id="complete-title">انتهت المرحلة!</div>
-                <div id="complete-stars"></div>
+                <div id="complete-stars" aria-hidden="true"></div>
                 <div id="complete-msg">لقد أحرزت تقدماً رائعاً</div>
-                <button id="complete-btn">العودة للقائمة</button>
+                <button type="button" id="complete-btn">العودة للقائمة</button>
             </div>
         </div>
+
+        <dialog id="reset-dialog" aria-labelledby="reset-dialog-title">
+            <div id="reset-dialog-title" class="dialog-title">إعادة تعيين النجوم</div>
+            <div class="dialog-desc">هل أنت متأكد من حذف جميع النجوم والبدء من الصفر؟</div>
+            <div class="dialog-actions">
+                <button type="button" class="dialog-btn dialog-cancel" id="reset-cancel-btn">إلغاء</button>
+                <button type="button" class="dialog-btn dialog-confirm" id="reset-confirm-btn">نعم، إعادة التعيين</button>
+            </div>
+        </dialog>
     </div>
 
     <script>
@@ -404,24 +470,48 @@
 
         // ================== نظام الصوت (الملفات الصوتية الحقيقية فقط - بدون TTS) ==================
         let currentAudio = null;
+        let isAudioPlaying = false;
+        let audioLockSafetyTimer = null;
+
+        function setAudioLock(locked) {
+            isAudioPlaying = locked;
+            if (audioLockSafetyTimer) {
+                clearTimeout(audioLockSafetyTimer);
+                audioLockSafetyTimer = null;
+            }
+            if (locked) {
+                document.body.classList.add('audio-locked');
+                audioLockSafetyTimer = setTimeout(() => {
+                    isAudioPlaying = false;
+                    document.body.classList.remove('audio-locked');
+                }, 6000);
+            } else {
+                document.body.classList.remove('audio-locked');
+            }
+        }
 
         function stopCurrentAudio() {
             if (currentAudio) {
                 try {
+                    currentAudio.onended = null;
+                    currentAudio.onerror = null;
                     currentAudio.pause();
                     currentAudio.currentTime = 0;
                 } catch (e) {}
                 currentAudio = null;
             }
+            setAudioLock(false);
         }
 
         function playAudio(paths, onEnd) {
             stopCurrentAudio();
             const list = Array.isArray(paths) ? paths : [paths];
             let idx = 0;
+            setAudioLock(true);
 
             function tryNext() {
                 if (idx >= list.length) {
+                    setAudioLock(false);
                     if (onEnd) onEnd();
                     return;
                 }
@@ -434,6 +524,7 @@
                     if (!called) {
                         called = true;
                         if (currentAudio === audio) currentAudio = null;
+                        setAudioLock(false);
                         if (onEnd) onEnd();
                     }
                 };
@@ -633,10 +724,17 @@
             const grid = document.getElementById('level-grid'); grid.innerHTML = '';
 
             for (let i = start; i < end; i++) {
-                const btn = document.createElement('div'); btn.className = 'level-btn';
-                btn.innerText = `${i+1}`;
-                const starsDiv = document.createElement('div'); starsDiv.className = 'stars';
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'level-btn';
                 const starCount = levels[i].stars;
+                btn.setAttribute('aria-label', `المرحلة ${i+1}، ${starCount} من 3 نجوم`);
+                const numSpan = document.createElement('span');
+                numSpan.innerText = `${i+1}`;
+                btn.appendChild(numSpan);
+                const starsDiv = document.createElement('div');
+                starsDiv.className = 'stars';
+                starsDiv.setAttribute('aria-hidden', 'true');
                 starsDiv.innerHTML = (starCount>0?'⭐'.repeat(starCount):'') + '<span class="empty">☆</span>'.repeat(3-starCount);
                 btn.appendChild(starsDiv);
                 btn.onclick = () => startLevel(i);
@@ -681,14 +779,27 @@
             setTimeout(resizeGame, 350);
         };
 
-        document.getElementById('reset-btn').onclick = () => {
-            if(confirm('هل أنت متأكد من رغبتك في حذف جميع النجوم وإعادة التقدم للصفر؟')) {
-                for(let i=0; i<TOTAL_LEVELS; i++) {
-                    levels[i].stars = 0;
-                    localStorage.removeItem(`level_${i}_stars`);
-                }
-                renderMenu();
+        const resetDialog = document.getElementById('reset-dialog');
+        function performResetStars() {
+            for(let i=0; i<TOTAL_LEVELS; i++) {
+                levels[i].stars = 0;
+                localStorage.removeItem(`level_${i}_stars`);
             }
+            renderMenu();
+        }
+        document.getElementById('reset-btn').onclick = () => {
+            if (resetDialog && typeof resetDialog.showModal === 'function') {
+                resetDialog.showModal();
+            } else if (confirm('هل أنت متأكد من رغبتك في حذف جميع النجوم وإعادة التقدم للصفر؟')) {
+                performResetStars();
+            }
+        };
+        document.getElementById('reset-cancel-btn').onclick = () => {
+            if (resetDialog && resetDialog.open) resetDialog.close();
+        };
+        document.getElementById('reset-confirm-btn').onclick = () => {
+            if (resetDialog && resetDialog.open) resetDialog.close();
+            performResetStars();
         };
 
         function startLevel(levelIdx) {
@@ -714,7 +825,9 @@
         }
 
         // ================== طور التهجئة ==================
+        let isLetterAnimating = false;
         function startSpelling() {
+            isLetterAnimating = false;
             const word = levels[currentLevelIdx].words[currentWordIdx];
             const [s1, s2, s3] = getConnectedSyllables(word);
 
@@ -723,7 +836,7 @@
         }
 
         function handleCircleClick(letterIndex) {
-            if (currentGameMode !== 'spelling') return;
+            if (currentGameMode !== 'spelling' || isAudioPlaying || isLetterAnimating) return;
             const word = levels[currentLevelIdx].words[currentWordIdx];
             const letters = [word.l1, word.l2, word.l3];
             const l = letters[letterIndex - 1];
@@ -732,18 +845,38 @@
 
             const spans = document.querySelectorAll('#word-display span');
             if(spans.length < 3) return;
+            isLetterAnimating = true;
+            spans.forEach((sp, idx) => {
+                if (idx === letterIndex - 1) sp.classList.remove('dimmed');
+                else sp.classList.add('dimmed');
+            });
             spans[letterIndex - 1].innerHTML = `<c${letterIndex}a>${letterFormatted}</c${letterIndex}a>`;
 
-            // تشغيل صوت الحرف من ملفات الصوت الحقيقية
-            playLetterAudio(l);
-
-            setTimeout(() => {
+            let animDone = false;
+            let audioDone = false;
+            const tryRestore = () => {
+                if (!animDone || !audioDone) return;
+                isLetterAnimating = false;
                 spans[letterIndex - 1].innerHTML = `<c${letterIndex}>${letterFormatted}</c${letterIndex}>`;
-            }, 500);
+                if (!document.querySelector('#word-display c1a, #word-display c2a, #word-display c3a')) {
+                    spans.forEach(sp => sp.classList.remove('dimmed'));
+                }
+                if (letterIndex === 1) document.getElementById('circle2').classList.add('visible');
+                else if (letterIndex === 2) document.getElementById('circle3').classList.add('visible');
+                else if (letterIndex === 3) listenBtn.style.display = 'flex';
+            };
 
-            if (letterIndex === 1) setTimeout(() => document.getElementById('circle2').classList.add('visible'), 500);
-            else if (letterIndex === 2) setTimeout(() => document.getElementById('circle3').classList.add('visible'), 500);
-            else if (letterIndex === 3) setTimeout(() => { listenBtn.style.display = 'flex'; }, 600);
+            // تشغيل صوت الحرف من ملفات الصوت الحقيقية والانتظار حتى انتهائه
+            playLetterAudio(l, () => {
+                audioDone = true;
+                tryRestore();
+            });
+
+            // إعطاء وقت أطول للحرف (1100ms) لترسيخ التركيز لدى الطالب
+            setTimeout(() => {
+                animDone = true;
+                tryRestore();
+            }, 1100);
         }
 
         document.getElementById('circle1').onclick = () => handleCircleClick(1);
@@ -751,6 +884,7 @@
         document.getElementById('circle3').onclick = () => handleCircleClick(3);
 
         listenBtn.onclick = () => {
+            if (isAudioPlaying || isLetterAnimating) return;
             const word = levels[currentLevelIdx].words[currentWordIdx];
             // تشغيل صوت الكلمة من ملفات الصوت الحقيقية
             playWordAudio(word.full, () => {
@@ -759,6 +893,7 @@
         };
 
         nextBtn.onclick = () => {
+            if (isAudioPlaying || isLetterAnimating) return;
             playNextSound();
             currentWordIdx++;
             if (currentWordIdx < WORDS_PER_LEVEL) startSpelling();
@@ -790,6 +925,8 @@
             if (currentTestQuestionIdx >= order.length) { finishLevel(); return; }
 
             currentTargetWord = order[currentTestQuestionIdx];
+            const qNumEl = document.getElementById('test-q-num');
+            if (qNumEl) qNumEl.innerText = `${currentTestQuestionIdx + 1} / ${order.length}`;
             const wrongOptionsCount = (currentLevelIdx === 0) ? 1 : 3;
             let wrongOptions = shuffleArray(testPool.filter(w => w.full !== currentTargetWord.full)).slice(0, wrongOptionsCount);
             let allOptions = shuffleArray([currentTargetWord, ...wrongOptions]);
@@ -802,13 +939,15 @@
             isConfirming = false;
 
             allOptions.forEach(wordObj => {
-                const btn = document.createElement('div');
+                const btn = document.createElement('button');
+                btn.type = 'button';
                 btn.className = 'test-option-btn';
+                btn.setAttribute('aria-label', `خيار: ${wordObj.full}`);
                 const [l1f, l2f, l3f] = getConnectedSyllables(wordObj);
                 btn.innerHTML = `<word><span><c1>${l1f}</c1></span><span><c2>${l2f}</c2></span><span><c3>${l3f}</c3></span></word>`;
                 
                 btn.onclick = () => {
-                    if (isConfirming) return;
+                    if (isConfirming || isAudioPlaying) return;
                     playClickSound();
                     document.querySelectorAll('.test-option-btn').forEach(b => b.classList.remove('selected'));
                     btn.classList.add('selected');
@@ -824,11 +963,12 @@
         }
 
         speakQBtn.onclick = () => {
+            if (isConfirming || isAudioPlaying) return;
             playQuestionAudio(currentTargetWord.full);
         };
 
         confirmBtn.onclick = () => {
-            if (!selectedOptionWord || isConfirming) return;
+            if (!selectedOptionWord || isConfirming || isAudioPlaying) return;
             isConfirming = true;
             const allBtns = document.querySelectorAll('.test-option-btn');
             const selectedBtn = Array.from(allBtns).find(b => b.classList.contains('selected'));
@@ -840,14 +980,22 @@
                 confirmBtn.classList.remove('active');
                 confirmBtn.style.pointerEvents = 'none';
                 
-                // تشغيل عبارة التعزيز الإيجابية المناسبة لجنس الطالب (طالب / طالبة)
-                setTimeout(() => { playPraiseAudio(); }, 350);
-
-                setTimeout(() => {
+                // انتظار انتهاء عبارة التعزيز تماماً + فاصل مريح ذهنياً (900ms) قبل السؤال التالي
+                let advanced = false;
+                const goNext = () => {
+                    if (advanced) return;
+                    advanced = true;
                     isConfirming = false;
                     currentTestQuestionIdx++;
                     showTestQuestion(testOrder);
-                }, 1300);
+                };
+                const safetyTimer = setTimeout(goNext, 4500);
+                setTimeout(() => {
+                    playPraiseAudio(() => {
+                        clearTimeout(safetyTimer);
+                        setTimeout(goNext, 900);
+                    });
+                }, 350);
             } else {
                 playWrongSound();
                 testErrors++; // زيادة عدد الأخطاء المسجلة
@@ -856,15 +1004,23 @@
                 confirmBtn.classList.remove('active');
                 confirmBtn.style.pointerEvents = 'none';
 
-                // تشغيل رسالة التشجيع المناسبة لجنس الطالب (طالب / طالبة)
-                setTimeout(() => { playTryAgainAudio(); }, 350);
-
-                setTimeout(() => {
+                // انتظار انتهاء رسالة التشجيع تماماً + فاصل هادئ قبل إعادة المحاولة
+                let unlocked = false;
+                const unlockRetry = () => {
+                    if (unlocked) return;
+                    unlocked = true;
                     selectedBtn.classList.remove('wrong');
                     selectedBtn.style.pointerEvents = 'all';
                     selectedOptionWord = null;
                     isConfirming = false;
-                }, 1500);
+                };
+                const safetyTimer = setTimeout(unlockRetry, 5000);
+                setTimeout(() => {
+                    playTryAgainAudio(() => {
+                        clearTimeout(safetyTimer);
+                        setTimeout(unlockRetry, 700);
+                    });
+                }, 350);
             }
         };
 
@@ -930,6 +1086,10 @@
         }
 
         document.getElementById('back-btn').onclick = () => {
+            stopCurrentAudio();
+            renderMenu();
+        };
+        document.getElementById('test-back-btn').onclick = () => {
             stopCurrentAudio();
             renderMenu();
         };
