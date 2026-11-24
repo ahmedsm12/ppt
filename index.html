@@ -931,7 +931,7 @@
             let wrongOptions = shuffleArray(testPool.filter(w => w.full !== currentTargetWord.full)).slice(0, wrongOptionsCount);
             let allOptions = shuffleArray([currentTargetWord, ...wrongOptions]);
 
-            testQuestion.innerText = '🔊'; 
+            testQuestion.innerText = ''; 
             testOptions.innerHTML = '';
             selectedOptionWord = null;
             confirmBtn.classList.remove('active');
